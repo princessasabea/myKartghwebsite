@@ -266,3 +266,4 @@ const Team: React.FC = () => {
 };
 
 export default Team;
+
