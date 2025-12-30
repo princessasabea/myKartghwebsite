@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 
 interface TeamMember {
@@ -8,6 +7,7 @@ interface TeamMember {
   linkedin?: string;
   github?: string;
   image?: string;
+  // Added 'contributor' to the allowed categories
   category: 'lead' | 'tech' | 'design' | 'ops' | 'contributor';
 }
 
@@ -165,10 +165,19 @@ const Team: React.FC = () => {
 
       <section className="py-16 px-4">
         <div className="max-w-6xl mx-auto">
-          {['tech', 'design', 'ops'].map(cat => {
+          {/* Added 'contributor' to the map array below */}
+          {['tech', 'design', 'ops', 'contributor'].map(cat => {
             const filteredMembers = team.filter(m => m.category === cat);
-            const title = cat === 'tech' ? 'Technology' : cat === 'design' ? 'Design' : 'Operations';
+            
+            // Logic to determine the Section Title
+            let title = '';
+            if (cat === 'tech') title = 'Technology';
+            else if (cat === 'design') title = 'Design';
+            else if (cat === 'ops') title = 'Operations';
+            else if (cat === 'contributor') title = 'Contributors & Ideation'; // New Title
+
             if (filteredMembers.length === 0) return null;
+            
             return (
               <div key={cat} className="mb-20">
                 <h2 className="text-sm font-black mb-8 border-l-4 border-primary pl-4 uppercase tracking-widest text-dark/40">{title}</h2>
@@ -193,10 +202,10 @@ const Team: React.FC = () => {
           >
             <div className="absolute top-0 right-0 p-6">
                <button 
-                  onClick={() => setSelectedMember(null)}
-                  className="w-10 h-10 rounded-full bg-gray-50 flex items-center justify-center text-muted hover:bg-gray-100 transition-colors"
+                 onClick={() => setSelectedMember(null)}
+                 className="w-10 h-10 rounded-full bg-gray-50 flex items-center justify-center text-muted hover:bg-gray-100 transition-colors"
                >
-                  <span className="material-symbols-outlined">close</span>
+                 <span className="material-symbols-outlined">close</span>
                </button>
             </div>
             
@@ -269,4 +278,3 @@ const Team: React.FC = () => {
 };
 
 export default Team;
-
