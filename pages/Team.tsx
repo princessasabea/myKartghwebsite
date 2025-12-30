@@ -8,7 +8,7 @@ interface TeamMember {
   linkedin?: string;
   github?: string;
   image?: string;
-  category: 'lead' | 'tech' | 'design' | 'ops';
+  category: 'lead' | 'tech' | 'design' | 'ops' | 'contributor';
 }
 
 const Team: React.FC = () => {
@@ -38,31 +38,34 @@ const Team: React.FC = () => {
       linkedin: 'https://www.linkedin.com/in/kwaku-aboagye-frempong'
     },
     {
-      name: 'Seth Akoto',
-      role: 'Frontend Developer',
-      description: 'Builds and refines responsive interfaces across the myKart platform.',
-      category: 'tech',
-      linkedin: 'https://www.linkedin.com/in/sethakoto/'
-    },
-    {
-      name: 'Peter Kersi',
-      role: 'Frontend Developer',
-      description: 'Builds and refines responsive interfaces across the myKart platform.',
-      category: 'tech',
-      linkedin: 'https://www.linkedin.com/in/peter-kersi-9826372b7/',
-      github: 'https://github.com/jpkersi'
-    },
-    {
       name: 'Nana Yaw',
       role: 'Frontend Developer',
       description: 'Building beautiful, responsive user interfaces and ensuring a seamless experience for our customers.',
       category: 'tech',
     },
+    // MOVED SETH TO CONTRIBUTOR
+    {
+      name: 'Seth Akoto',
+      role: 'Community & Ideation',
+      description: 'Contributed to early brainstorming sessions and helped shape the initial conceptualization of the MyKart platform.',
+      category: 'contributor',
+      linkedin: 'https://www.linkedin.com/in/sethakoto/'
+    },
+    // MOVED PETER TO CONTRIBUTOR
+    {
+      name: 'Peter Kersi',
+      role: 'Community & Ideation',
+      description: 'Provided valuable input on product direction and user experience concepts during the foundational phase.',
+      category: 'contributor',
+      linkedin: 'https://www.linkedin.com/in/peter-kersi-9826372b7/',
+      github: 'https://github.com/jpkersi'
+    },
+    // MOVED THEOFORD TO CONTRIBUTOR
     {
       name: 'Theoford Gyanfosu',
-      role: 'Backend Developer',
-      description: 'Builds and maintains backend services supporting orders and data flow.',
-      category: 'tech',
+      role: 'Community & Ideation',
+      description: 'Supported the team with core ideas and strategic discussions that helped define the backend logic requirements.',
+      category: 'contributor',
       linkedin: 'https://www.linkedin.com/in/theoford-gyanfosu-7b2a5a2b8/',
       github: 'https://github.com/nanagyanfosu'
     },
