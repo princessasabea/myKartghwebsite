@@ -237,7 +237,7 @@ const Home: React.FC = () => {
              </p>
              <div className="flex flex-col gap-3">
                 <a 
-                  href="https://www.linkedin.com/company/mykartstartup/posts/?feedView=all" 
+                  href="https://www.linkedin.com/company/mykartstartup/" 
                   target="_blank" 
                   rel="noopener noreferrer"
                   className="w-full py-4 bg-dark text-white font-bold rounded-2xl text-center flex items-center justify-center gap-2 hover:bg-black transition-colors"
