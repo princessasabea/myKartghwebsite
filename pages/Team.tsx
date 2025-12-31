@@ -109,7 +109,7 @@ const Team: React.FC = () => {
     <div 
       key={idx} 
       onClick={() => setSelectedMember(member)}
-      className={`group cursor-pointer bg-white border border-gray-100 hover:border-primary/20 hover:shadow-2xl hover:shadow-gray-200/50 transition-all flex flex-col gap-4 relative overflow-hidden ${isLarge ? 'p-10 rounded-[3rem] max-w-2xl mx-auto' : 'p-6 rounded-3xl'}`}
+      className={`group cursor-pointer bg-white dark:bg-white/5 border border-gray-100 hover:border-primary/20 hover:shadow-2xl hover:shadow-gray-200/50 transition-all flex flex-col gap-4 relative overflow-hidden ${isLarge ? 'p-10 rounded-[3rem] max-w-2xl mx-auto' : 'p-6 rounded-3xl'}`}
     >
       <div className={`flex justify-between items-start ${isLarge ? 'flex-col items-center text-center' : ''}`}>
         <div className={`${isLarge ? 'w-32 h-32 md:w-48 md:h-48 mb-6' : 'w-14 h-14'} bg-bg-light rounded-2xl md:rounded-[2rem] flex items-center justify-center font-black text-primary overflow-hidden border border-gray-50 shadow-inner`}>
@@ -124,7 +124,7 @@ const Team: React.FC = () => {
         {!isLarge && (
           <div className="flex gap-2">
             {member.linkedin && (
-              <a href={member.linkedin} target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-full bg-gray-50 flex items-center justify-center text-muted hover:bg-primary hover:text-white transition-all" onClick={(e) => e.stopPropagation()}>
+              <a href={member.linkedin} target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-full bg-gray-50 flex items-center justify-center text-muted dark:text-gray-300 hover:bg-primary hover:text-white transition-all" onClick={(e) => e.stopPropagation()}>
                 <span className="material-symbols-outlined text-[20px]">link</span>
               </a>
             )}
@@ -132,9 +132,9 @@ const Team: React.FC = () => {
         )}
       </div>
       <div className={isLarge ? 'text-center' : ''}>
-        <h4 className={`${isLarge ? 'text-3xl md:text-4xl' : 'text-lg'} font-black text-dark group-hover:text-primary transition-colors`}>{member.name}</h4>
+        <h4 className={`${isLarge ? 'text-3xl md:text-4xl' : 'text-lg'} font-black text-dark dark:text-white group-hover:text-primary transition-colors`}>{member.name}</h4>
         <p className={`${isLarge ? 'text-sm mb-4' : 'text-[10px]'} text-primary font-extrabold uppercase tracking-widest`}>{member.role}</p>
-        {isLarge && <p className="text-muted text-lg leading-relaxed max-w-lg mx-auto">{member.description}</p>}
+        {isLarge && <p className="text-muted dark:text-gray-300 text-lg leading-relaxed max-w-lg mx-auto">{member.description}</p>}
       </div>
       {!isLarge && (
         <div className="mt-2 flex items-center gap-1">
@@ -149,16 +149,16 @@ const Team: React.FC = () => {
 
   return (
     <div className="flex flex-col w-full bg-bg-light min-h-screen">
-      <section className="pt-24 pb-16 px-4 bg-white border-b border-gray-100">
+      <section className="pt-24 pb-16 px-4 bg-white dark:bg-white/5 border-b border-gray-100">
         <div className="max-w-6xl mx-auto text-center">
           <span className="text-primary font-bold text-xs uppercase tracking-widest block mb-4">EST. 2025</span>
-          <h1 className="text-5xl md:text-8xl font-black mb-8 text-dark tracking-tighter leading-none">Our Core Team.</h1>
+          <h1 className="text-5xl md:text-8xl font-black mb-8 text-dark dark:text-white tracking-tighter leading-none">Our Core Team.</h1>
         </div>
       </section>
 
       <section className="py-20 px-4">
         <div className="max-w-6xl mx-auto">
-          <h2 className="text-sm font-black mb-12 text-center uppercase tracking-widest text-dark/40">Founder & Lead</h2>
+          <h2 className="text-sm font-black mb-12 text-center uppercase tracking-widest text-dark dark:text-white/40">Founder & Lead</h2>
           {renderMemberCard(leadMember, 0, true)}
         </div>
       </section>
@@ -180,7 +180,7 @@ const Team: React.FC = () => {
             
             return (
               <div key={cat} className="mb-20">
-                <h2 className="text-sm font-black mb-8 border-l-4 border-primary pl-4 uppercase tracking-widest text-dark/40">{title}</h2>
+                <h2 className="text-sm font-black mb-8 border-l-4 border-primary pl-4 uppercase tracking-widest text-dark dark:text-white/40">{title}</h2>
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                   {filteredMembers.map((m, idx) => renderMemberCard(m, idx))}
                 </div>
@@ -197,13 +197,13 @@ const Team: React.FC = () => {
           onClick={() => setSelectedMember(null)}
         >
           <div 
-            className="bg-white rounded-[2.5rem] w-full max-w-lg shadow-2xl animate-in zoom-in-95 duration-200 p-8 md:p-12 text-center relative overflow-hidden"
+            className="bg-white dark:bg-white/5 rounded-[2.5rem] w-full max-w-lg shadow-2xl animate-in zoom-in-95 duration-200 p-8 md:p-12 text-center relative overflow-hidden"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="absolute top-0 right-0 p-6">
                <button 
                  onClick={() => setSelectedMember(null)}
-                 className="w-10 h-10 rounded-full bg-gray-50 flex items-center justify-center text-muted hover:bg-gray-100 transition-colors"
+                 className="w-10 h-10 rounded-full bg-gray-50 flex items-center justify-center text-muted dark:text-gray-300 hover:bg-gray-100 transition-colors"
                >
                  <span className="material-symbols-outlined">close</span>
                </button>
@@ -219,21 +219,21 @@ const Team: React.FC = () => {
               )}
             </div>
             
-            <h3 className="text-3xl font-black text-dark mb-1">{selectedMember.name}</h3>
+            <h3 className="text-3xl font-black text-dark dark:text-white mb-1">{selectedMember.name}</h3>
             <p className="text-primary font-extrabold uppercase tracking-widest text-xs mb-6">{selectedMember.role}</p>
             
-            <p className="text-muted text-lg leading-relaxed mb-8">
+            <p className="text-muted dark:text-gray-300 text-lg leading-relaxed mb-8">
               {selectedMember.description}
             </p>
             
             <div className="flex justify-center gap-4 mb-8">
               {selectedMember.linkedin && (
-                <a href={selectedMember.linkedin} target="_blank" rel="noopener noreferrer" className="w-12 h-12 rounded-full bg-gray-50 flex items-center justify-center text-muted hover:bg-primary hover:text-white transition-all">
+                <a href={selectedMember.linkedin} target="_blank" rel="noopener noreferrer" className="w-12 h-12 rounded-full bg-gray-50 flex items-center justify-center text-muted dark:text-gray-300 hover:bg-primary hover:text-white transition-all">
                   <span className="material-symbols-outlined">link</span>
                 </a>
               )}
               {selectedMember.github && (
-                <a href={selectedMember.github} target="_blank" rel="noopener noreferrer" className="w-12 h-12 rounded-full bg-gray-50 flex items-center justify-center text-muted hover:bg-primary hover:text-white transition-all">
+                <a href={selectedMember.github} target="_blank" rel="noopener noreferrer" className="w-12 h-12 rounded-full bg-gray-50 flex items-center justify-center text-muted dark:text-gray-300 hover:bg-primary hover:text-white transition-all">
                   <span className="material-symbols-outlined text-[20px]">code</span>
                 </a>
               )}
@@ -250,14 +250,14 @@ const Team: React.FC = () => {
       )}
 
       {/* Join the Team Section */}
-      <section className="py-32 px-4 bg-white border-t border-gray-100 relative overflow-hidden">
+      <section className="py-32 px-4 bg-white dark:bg-white/5 border-t border-gray-100 relative overflow-hidden">
         <div className="max-w-4xl mx-auto text-center relative z-10">
            <div className="inline-flex items-center gap-2 px-4 py-1 bg-primary/10 rounded-full mb-8">
               <span className="material-symbols-outlined text-primary text-[18px]">rocket_launch</span>
               <span className="text-xs font-black text-primary uppercase tracking-widest">We are Looking for Volunteers</span>
            </div>
-           <h2 className="text-4xl md:text-7xl font-black text-dark tracking-tighter leading-[0.95] mb-8">Join the Mission.</h2>
-           <p className="text-xl text-muted font-medium max-w-2xl mx-auto leading-relaxed mb-12">
+           <h2 className="text-4xl md:text-7xl font-black text-dark dark:text-white tracking-tighter leading-[0.95] mb-8">Join the Mission.</h2>
+           <p className="text-xl text-muted dark:text-gray-300 font-medium max-w-2xl mx-auto leading-relaxed mb-12">
              We are looking for passionate builders, designers, and operators to help us reshape retail in Ghana. If you want to build for the future, we want to meet you.
            </p>
            <a 

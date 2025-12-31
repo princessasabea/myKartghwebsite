@@ -6,13 +6,13 @@ const Vision: React.FC = () => {
   return (
     <div className="flex flex-col w-full bg-bg-light min-h-screen">
       {/* Vision Hero */}
-      <section className="py-24 px-4 bg-white border-b border-gray-100 relative overflow-hidden">
+      <section className="py-24 px-4 bg-white dark:bg-white/5 border-b border-gray-100 relative overflow-hidden">
         <div className="max-w-6xl mx-auto relative z-10">
           <span className="text-primary font-black text-xs uppercase tracking-[0.3em] block mb-4">OUR VISION</span>
-          <h1 className="text-5xl md:text-8xl font-black mb-8 text-dark tracking-tighter leading-[0.95]">
+          <h1 className="text-5xl md:text-8xl font-black mb-8 text-dark dark:text-white tracking-tighter leading-[0.95]">
             Reimagining retail <br/> with a <span className="text-primary italic">Global Vision.</span>
           </h1>
-          <p className="text-2xl text-muted max-w-2xl leading-relaxed font-medium">
+          <p className="text-2xl text-muted dark:text-gray-300 max-w-2xl leading-relaxed font-medium">
             The story of a team building the bridge between technology and Ghanaian market realities.
           </p>
         </div>
@@ -23,7 +23,7 @@ const Vision: React.FC = () => {
       <section className="py-24 px-4 bg-dark text-white">
         <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-center gap-16">
           <div className="flex-1">
-             <span className="inline-block px-4 py-1 bg-white/10 backdrop-blur border border-white/20 text-white text-xs font-bold rounded-full mb-6 uppercase tracking-widest">The Core Vision</span>
+             <span className="inline-block px-4 py-1 bg-white dark:bg-white/5/10 backdrop-blur border border-white/20 text-white text-xs font-bold rounded-full mb-6 uppercase tracking-widest">The Core Vision</span>
              <h2 className="text-4xl md:text-6xl font-black leading-tight mb-8">Building for the <br/>Ghanaian Context.</h2>
              <p className="text-xl text-gray-300 leading-relaxed">
                 MyKart was born from a simple observation: getting reliable groceries shouldn't be a gamble. We are building a platform that doesn't just deliver food, but builds trust between modern technology and local market vendors.
@@ -45,7 +45,7 @@ const Vision: React.FC = () => {
       <section className="py-24 px-4 bg-bg-light">
         <div className="max-w-6xl mx-auto text-center mb-16">
           <h2 className="text-3xl md:text-5xl font-black mb-4 tracking-tighter">MyKart Roadmap.</h2>
-          <p className="text-muted text-lg font-medium">Three core pillars guiding our launch.</p>
+          <p className="text-muted dark:text-gray-300 text-lg font-medium">Three core pillars guiding our launch.</p>
         </div>
         
         <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-8 mb-24">
@@ -54,19 +54,19 @@ const Vision: React.FC = () => {
             { title: 'Live Stock Engine', text: 'Building inventory integration with vendors to eliminate out-of-stock surprises from day one.', icon: 'inventory_2', color: 'bg-green-500' },
             { title: 'Reliable Slots', text: 'Designing delivery windows that fit your life. Engineering a system for high punctuality.', icon: 'schedule', color: 'bg-blue-500' }
           ].map((item, idx) => (
-            <div key={idx} className="bg-white p-10 rounded-[2.5rem] shadow-xl shadow-gray-200/50 border border-gray-50 text-center flex flex-col items-center">
+            <div key={idx} className="bg-white dark:bg-white/5 p-10 rounded-[2.5rem] shadow-xl shadow-gray-200/50 border border-gray-50 text-center flex flex-col items-center">
               <div className={`w-16 h-16 ${item.color} text-white rounded-2xl flex items-center justify-center mb-8 shadow-lg`}>
                 <span className="material-symbols-outlined text-[32px]">{item.icon}</span>
               </div>
               <h4 className="text-2xl font-bold mb-4">{item.title}</h4>
-              <p className="text-muted leading-relaxed font-medium">{item.text}</p>
+              <p className="text-muted dark:text-gray-300 leading-relaxed font-medium">{item.text}</p>
             </div>
           ))}
         </div>
       </section>
 
       {/* Origin Story */}
-      <section className="py-24 px-4 bg-white border-t border-gray-100">
+      <section className="py-24 px-4 bg-white dark:bg-white/5 border-t border-gray-100">
         <div className="max-w-4xl mx-auto">
           <div className="space-y-16">
             <div className="flex flex-col md:flex-row gap-12 items-start">
@@ -74,8 +74,8 @@ const Vision: React.FC = () => {
                 <span className="material-symbols-outlined text-[40px]">school</span>
               </div>
               <div className="space-y-6">
-                <h2 className="text-3xl md:text-4xl font-black text-dark tracking-tighter">A Student Spark</h2>
-                <div className="text-muted text-lg leading-relaxed font-medium space-y-4">
+                <h2 className="text-3xl md:text-4xl font-black text-dark dark:text-white tracking-tighter">A Student Spark</h2>
+                <div className="text-muted dark:text-gray-300 text-lg leading-relaxed font-medium space-y-4">
                   <p>
                     MyKart started in dorm rooms—a simple, hungry idea among students looking to create something meaningful. We wanted to blend global technology with what we call a <span className="italic text-primary font-bold">"Swift Culture Touch"</span>—modern speed that respects traditional market values.
                   </p>
@@ -88,22 +88,22 @@ const Vision: React.FC = () => {
                 <span className="material-symbols-outlined text-[40px]">query_stats</span>
               </div>
               <div className="space-y-6">
-                <h2 className="text-3xl md:text-4xl font-black text-dark tracking-tighter">Data Meets Friendship</h2>
-                <div className="text-muted text-lg leading-relaxed font-medium space-y-4">
+                <h2 className="text-3xl md:text-4xl font-black text-dark dark:text-white tracking-tighter">Data Meets Friendship</h2>
+                <div className="text-muted dark:text-gray-300 text-lg leading-relaxed font-medium space-y-4">
                   <p>
-                    We spoke to over 100 potential users. The data was clear: <span className="text-dark font-bold">65% of Ghanaians</span> avoid online groceries because they want to physically see their items. This insight became the foundation of our "Personal Shopper" model.
+                    We spoke to over 100 potential users. The data was clear: <span className="text-dark dark:text-white font-bold">65% of Ghanaians</span> avoid online groceries because they want to physically see their items. This insight became the foundation of our "Personal Shopper" model.
                   </p>
                 </div>
               </div>
             </div>
 
             <div className="flex flex-col md:flex-row gap-12 items-start">
-              <div className="w-20 h-20 bg-accent/20 rounded-3xl flex items-center justify-center text-muted shrink-0">
+              <div className="w-20 h-20 bg-accent/20 rounded-3xl flex items-center justify-center text-muted dark:text-gray-300 shrink-0">
                 <span className="material-symbols-outlined text-[40px]">public</span>
               </div>
               <div className="space-y-6">
-                <h2 className="text-3xl md:text-4xl font-black text-dark tracking-tighter">A Global Team</h2>
-                <div className="text-muted text-lg leading-relaxed font-medium space-y-4">
+                <h2 className="text-3xl md:text-4xl font-black text-dark dark:text-white tracking-tighter">A Global Team</h2>
+                <div className="text-muted dark:text-gray-300 text-lg leading-relaxed font-medium space-y-4">
                   <p>
                     Today, our team spans continents, from North America to Accra. This diversity allows us to think globally while executing with deep Ghanaian roots. We balance lectures with logistics, and deadlines with development.
                   </p>
@@ -117,8 +117,8 @@ const Vision: React.FC = () => {
       {/* Closing Statement */}
       <section className="py-24 px-4 bg-bg-light border-t border-gray-100">
         <div className="max-w-4xl mx-auto text-center">
-          <h2 className="text-3xl md:text-5xl font-black text-dark mb-6 italic">"The story is just beginning."</h2>
-          <p className="text-muted text-lg font-medium mb-10 max-w-2xl mx-auto leading-relaxed">
+          <h2 className="text-3xl md:text-5xl font-black text-dark dark:text-white mb-6 italic">"The story is just beginning."</h2>
+          <p className="text-muted dark:text-gray-300 text-lg font-medium mb-10 max-w-2xl mx-auto leading-relaxed">
             We are building for the future, ready to grow, and ready to expand. Join us as we write the next chapter of Ghanaian retail.
           </p>
           <div className="flex flex-wrap justify-center gap-4">

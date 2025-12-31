@@ -37,15 +37,15 @@ const TruckSchedule: React.FC<TruckScheduleProps> = ({ showHero = true }) => {
   return (
     <div className={`flex flex-col w-full ${showHero ? 'bg-bg-light min-h-screen' : ''}`}>
       {showHero && (
-        <section className="py-20 px-4 bg-white border-b border-gray-100">
+        <section className="py-20 px-4 bg-white dark:bg-white/5 border-b border-gray-100">
           <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-center gap-12">
             <div className="flex-1">
               <div className="inline-flex items-center gap-2 px-3 py-1 bg-primary/10 rounded-full mb-6">
                 <span className="w-2 h-2 bg-primary rounded-full animate-pulse"></span>
                 <span className="text-xs font-black text-primary uppercase tracking-widest">Roadmap Phase 2</span>
               </div>
-              <h1 className="text-5xl md:text-7xl font-black mb-6 text-dark tracking-tighter">Kommunity Truck.</h1>
-              <p className="text-xl text-muted leading-relaxed font-medium">
+              <h1 className="text-5xl md:text-7xl font-black mb-6 text-dark dark:text-white tracking-tighter">Kommunity Truck.</h1>
+              <p className="text-xl text-muted dark:text-gray-300 leading-relaxed font-medium">
                 Bridging the accessibility gap. Our planned fleet of mobile distribution hubs will bring fresh market produce to neighborhoods outside standard delivery zones at wholesale prices.
               </p>
             </div>
@@ -56,8 +56,8 @@ const TruckSchedule: React.FC<TruckScheduleProps> = ({ showHero = true }) => {
                     <span className="material-symbols-outlined">notifications_active</span>
                   </div>
                   <div>
-                    <h4 className="font-bold text-dark">Beta Waitlist</h4>
-                    <p className="text-xs text-muted">Join 500+ households for early access.</p>
+                    <h4 className="font-bold text-dark dark:text-white">Beta Waitlist</h4>
+                    <p className="text-xs text-muted dark:text-gray-300">Join 500+ households for early access.</p>
                   </div>
                 </div>
                 <a 
@@ -80,8 +80,8 @@ const TruckSchedule: React.FC<TruckScheduleProps> = ({ showHero = true }) => {
       <section className={`${showHero ? 'py-20' : ''} px-4`}>
         <div className="max-w-6xl mx-auto">
           <div className="mb-12">
-             <h2 className="text-3xl font-black text-dark tracking-tight">Planned Weekly Routes</h2>
-             <p className="text-muted font-medium">Select a neighborhood to view the projected mobile market schedule.</p>
+             <h2 className="text-3xl font-black text-dark dark:text-white tracking-tight">Planned Weekly Routes</h2>
+             <p className="text-muted dark:text-gray-300 font-medium">Select a neighborhood to view the projected mobile market schedule.</p>
           </div>
 
           <div className="flex flex-wrap gap-4 mb-12 border-b border-gray-100 pb-8">
@@ -92,7 +92,7 @@ const TruckSchedule: React.FC<TruckScheduleProps> = ({ showHero = true }) => {
                 className={`px-8 py-3 rounded-2xl font-black text-sm transition-all shadow-sm ${
                   activeTab === tab 
                   ? 'bg-primary text-white shadow-xl shadow-primary/30 scale-105' 
-                  : 'bg-white text-muted hover:bg-gray-50'
+                  : 'bg-white dark:bg-white/5 text-muted dark:text-gray-300 hover:bg-gray-50'
                 }`}
               >
                 {tab}
@@ -103,20 +103,20 @@ const TruckSchedule: React.FC<TruckScheduleProps> = ({ showHero = true }) => {
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
             <div className="lg:col-span-2 space-y-4">
               {filteredSchedule.map((item, idx) => (
-                <div key={idx} className="bg-white p-8 rounded-3xl border border-gray-50 shadow-sm flex flex-col md:flex-row justify-between items-center group hover:border-primary/30 transition-all">
+                <div key={idx} className="bg-white dark:bg-white/5 p-8 rounded-3xl border border-gray-50 shadow-sm flex flex-col md:flex-row justify-between items-center group hover:border-primary/30 transition-all">
                   <div className="flex items-center gap-6 w-full md:w-auto mb-4 md:mb-0">
                     <div className="w-16 h-16 bg-bg-light rounded-2xl flex flex-col items-center justify-center text-primary border border-primary/10">
                       <span className="text-[10px] font-black uppercase">{item.day.substring(0, 3)}</span>
                       <span className="material-symbols-outlined text-[24px]">location_on</span>
                     </div>
                     <div>
-                      <h4 className="text-xl font-black text-dark">{item.location}</h4>
-                      <p className="text-muted font-bold text-sm">Target: {item.time}</p>
+                      <h4 className="text-xl font-black text-dark dark:text-white">{item.location}</h4>
+                      <p className="text-muted dark:text-gray-300 font-bold text-sm">Target: {item.time}</p>
                     </div>
                   </div>
                   
                   <div className="flex items-center gap-4 w-full md:w-auto justify-between md:justify-end">
-                    <span className="px-4 py-1 rounded-full text-[10px] font-black uppercase tracking-widest bg-gray-100 text-muted">
+                    <span className="px-4 py-1 rounded-full text-[10px] font-black uppercase tracking-widest bg-gray-100 text-muted dark:text-gray-300">
                       {item.status}
                     </span>
                     <button className="p-4 bg-bg-light rounded-xl hover:bg-primary hover:text-white transition-colors">
@@ -154,8 +154,8 @@ const TruckSchedule: React.FC<TruckScheduleProps> = ({ showHero = true }) => {
 
               {!showHero && (
                 <div className="bg-primary/10 p-8 rounded-[2.5rem] border border-primary/20">
-                  <h4 className="font-bold text-dark mb-2">Join the Waitlist</h4>
-                  <p className="text-sm text-muted mb-6">Be the first to know when we launch in your area.</p>
+                  <h4 className="font-bold text-dark dark:text-white mb-2">Join the Waitlist</h4>
+                  <p className="text-sm text-muted dark:text-gray-300 mb-6">Be the first to know when we launch in your area.</p>
                   <a 
                     href="https://tally.so/r/rjB4J2"
                     target="_blank"
@@ -168,11 +168,11 @@ const TruckSchedule: React.FC<TruckScheduleProps> = ({ showHero = true }) => {
               )}
 
               <div className="bg-accent/20 p-8 rounded-[2.5rem] border border-accent/30">
-                <h4 className="font-bold text-dark mb-2">Request a New Stop</h4>
-                <p className="text-sm text-muted mb-6">Suggest a neighborhood landmark for our pilot expansion.</p>
+                <h4 className="font-bold text-dark dark:text-white mb-2">Request a New Stop</h4>
+                <p className="text-sm text-muted dark:text-gray-300 mb-6">Suggest a neighborhood landmark for our pilot expansion.</p>
                 <button 
                   onClick={() => setShowProposalPopup(true)}
-                  className="w-full py-4 bg-white text-dark font-black rounded-2xl shadow-sm hover:shadow-md transition-all active:scale-95"
+                  className="w-full py-4 bg-white dark:bg-white/5 text-dark dark:text-white font-black rounded-2xl shadow-sm hover:shadow-md transition-all active:scale-95"
                 >
                   Submit Proposal
                 </button>
@@ -185,18 +185,18 @@ const TruckSchedule: React.FC<TruckScheduleProps> = ({ showHero = true }) => {
       {/* Proposal Popup */}
       {showProposalPopup && (
         <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-dark/60 backdrop-blur-sm animate-in fade-in duration-200">
-          <div className="bg-white rounded-[2.5rem] p-10 max-w-md w-full shadow-2xl animate-in zoom-in-95 duration-300 relative">
+          <div className="bg-white dark:bg-white/5 rounded-[2.5rem] p-10 max-w-md w-full shadow-2xl animate-in zoom-in-95 duration-300 relative">
              <button 
                 onClick={() => setShowProposalPopup(false)}
-                className="absolute top-6 right-6 text-muted hover:text-dark"
+                className="absolute top-6 right-6 text-muted dark:text-gray-300 hover:text-dark dark:text-white"
              >
                 <span className="material-symbols-outlined">close</span>
              </button>
              <div className="w-20 h-20 bg-primary/10 rounded-3xl flex items-center justify-center text-primary mb-8 mx-auto">
                 <span className="material-symbols-outlined text-[40px]">construction</span>
              </div>
-             <h3 className="text-3xl font-black text-center text-dark mb-4 tracking-tight">Coming soon in 2026!</h3>
-             <p className="text-muted text-center leading-relaxed mb-8 font-medium">
+             <h3 className="text-3xl font-black text-center text-dark dark:text-white mb-4 tracking-tight">Coming soon in 2026!</h3>
+             <p className="text-muted dark:text-gray-300 text-center leading-relaxed mb-8 font-medium">
                 We're currently perfecting our logistics model. Expansion proposals will be processed starting in 2026!
              </p>
              <button 

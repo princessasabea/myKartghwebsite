@@ -51,14 +51,14 @@ const Delivery: React.FC = () => {
           <div className="max-w-2xl mb-16">
             <span className="text-primary font-bold text-xs uppercase tracking-widest block mb-4">Infrastructure Planning</span>
             <h1 className="text-4xl md:text-7xl font-extrabold leading-tight mb-6">Planned Delivery Ecosystem</h1>
-            <p className="text-xl text-muted leading-relaxed">
+            <p className="text-xl text-muted dark:text-gray-300 leading-relaxed">
               We are perfecting several modes of delivery to ensure we reach every corner of the community efficiently.
             </p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {deliveryModes.map((item, idx) => (
-              <div key={idx} className="bg-white rounded-[2rem] shadow-xl shadow-gray-200/50 overflow-hidden flex flex-col group hover:scale-[1.02] transition-transform duration-300 border border-gray-100">
+              <div key={idx} className="bg-white dark:bg-white/5 rounded-[2rem] shadow-xl shadow-gray-200/50 overflow-hidden flex flex-col group hover:scale-[1.02] transition-transform duration-300 border border-gray-100">
                 <div className="h-48 overflow-hidden">
                   <img src={item.img} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" alt={item.title} />
                 </div>
@@ -68,7 +68,7 @@ const Delivery: React.FC = () => {
                     {item.tag}
                   </span>
                   <h3 className="text-2xl font-bold mb-4">{item.title}</h3>
-                  <p className="text-muted leading-relaxed mb-6 flex-1">{item.text}</p>
+                  <p className="text-muted dark:text-gray-300 leading-relaxed mb-6 flex-1">{item.text}</p>
                   <button 
                     onClick={() => setSelectedDetail(item)}
                     className="flex items-center gap-2 text-primary font-bold hover:gap-4 transition-all"
@@ -88,7 +88,7 @@ const Delivery: React.FC = () => {
           onClick={() => setSelectedDetail(null)}
         >
           <div 
-            className="bg-white rounded-[2.5rem] w-full max-w-2xl max-h-[90vh] overflow-y-auto shadow-2xl animate-in zoom-in-95 duration-200 p-8 md:p-12"
+            className="bg-white dark:bg-white/5 rounded-[2.5rem] w-full max-w-2xl max-h-[90vh] overflow-y-auto shadow-2xl animate-in zoom-in-95 duration-200 p-8 md:p-12"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex justify-between items-start mb-8">
@@ -97,13 +97,13 @@ const Delivery: React.FC = () => {
                   <span className="material-symbols-outlined text-[24px]">{selectedDetail.icon}</span>
                 </div>
                 <div>
-                  <h2 className="text-3xl font-black text-dark">Upcoming Feature</h2>
+                  <h2 className="text-3xl font-black text-dark dark:text-white">Upcoming Feature</h2>
                   <p className="text-primary font-bold text-xs uppercase tracking-widest">{selectedDetail.tag}</p>
                 </div>
               </div>
               <button 
                 onClick={() => setSelectedDetail(null)}
-                className="w-10 h-10 rounded-full bg-gray-50 flex items-center justify-center text-muted hover:bg-gray-100 transition-colors"
+                className="w-10 h-10 rounded-full bg-gray-50 flex items-center justify-center text-muted dark:text-gray-300 hover:bg-gray-100 transition-colors"
               >
                 <span className="material-symbols-outlined">close</span>
               </button>
@@ -115,7 +115,7 @@ const Delivery: React.FC = () => {
 
             <div className="prose prose-lg">
               {selectedDetail.longDesc.split('\n\n').map((para, i) => (
-                <p key={i} className="text-muted text-lg leading-relaxed mb-6 whitespace-pre-line">
+                <p key={i} className="text-muted dark:text-gray-300 text-lg leading-relaxed mb-6 whitespace-pre-line">
                   {para}
                 </p>
               ))}
