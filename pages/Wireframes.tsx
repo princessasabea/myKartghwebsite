@@ -672,7 +672,7 @@ const Wireframes: React.FC = () => {
                   <div className="relative z-10">
                     <h3 className="text-3xl font-black mb-4">Join the Pilot</h3>
                     <p className="text-white/80 text-lg mb-8 max-w-xs leading-relaxed">Be the first to test Roommate Run on your campus.</p>
-                    <a href="https://tally.so/r/WO2v4v" target="_blank" rel="noreferrer" className="inline-flex px-8 py-4 bg-white text-primary font-black rounded-2xl shadow-xl hover:scale-105 transition-transform active:scale-95">
+                    <a href="https://tally.so/r/rjB4J2" target="_blank" rel="noreferrer" className="inline-flex px-8 py-4 bg-white text-primary font-black rounded-2xl shadow-xl hover:scale-105 transition-transform active:scale-95">
                        Join Waitlist
                     </a>
                   </div>
