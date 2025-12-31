@@ -1,140 +1,231 @@
 import React, { useState, useEffect, useRef } from 'react';
 import TruckSchedule from './TruckSchedule';
 
-// --- COMPONENT 1: REAL ACCRA ROUTE SIMULATION ---
-const LiveTruckMap: React.FC = () => {
-  const [progress, setProgress] = useState(0);
-  const [isStopped, setIsStopped] = useState(false);
-  const [stopTimer, setStopTimer] = useState(0);
-  const [statusText, setStatusText] = useState("Loading Route...");
-
-  const STOPS = [
-    { percent: 5, name: "Melcom Depot", area: "North Ind. Area" },
-    { percent: 45, name: "A&C Mall", area: "East Legon" }, 
-    { percent: 90, name: "Community 1", area: "Tema" }
-  ];
+// --- COMPONENT 1: KOMMUNITY TRUCK JOURNEY SIMULATION ---
+const KommunityTruckJourney: React.FC = () => {
+  const [stage, setStage] = useState(0); 
+  const [subTick, setSubTick] = useState(0);
 
   useEffect(() => {
-    let animationFrameId: number;
+    const timers = [
+      setTimeout(() => setStage(1), 4000),   // T+4s
+      setTimeout(() => setStage(2), 8000),   // T+8s
+      setTimeout(() => setStage(3), 16000),  // T+16s
+      setTimeout(() => setStage(4), 28000),  // T+28s
+      setTimeout(() => setStage(5), 42000),  // T+42s
+      setTimeout(() => setStage(6), 58000),  // T+58s
+      setTimeout(() => setStage(7), 70000),  // T+70s
+      setTimeout(() => setStage(0), 80000),  // Loop
+    ];
     
-    const animate = () => {
-      if (isStopped) {
-        if (Date.now() > stopTimer) setIsStopped(false);
-      } else {
-        setProgress((prev) => {
-          let nextProgress = prev + 0.12;
-          if (nextProgress >= 100) nextProgress = 0;
-          const stopLocation = STOPS.find(s => Math.abs(s.percent - nextProgress) < 0.5);
-          if (stopLocation && stopTimer === 0) {
-            setIsStopped(true);
-            setStopTimer(Date.now() + 3000);
-            return stopLocation.percent;
-          }
-          if (!stopLocation) setStopTimer(0);
-          return nextProgress;
-        });
-      }
+    const interval = setInterval(() => {
+      setSubTick(prev => prev + 1);
+    }, 1000);
 
-      if (progress < 25) setStatusText("Departing: Melcom Warehouse");
-      else if (progress < 40) setStatusText("En Route: Madina Zongo Jxn");
-      else if (progress < 50) setStatusText("Arriving: East Legon Hub");
-      else if (progress < 75) setStatusText("Heading to: Spintex Road");
-      else setStatusText("Final Stretch: Tema Motorway");
-
-      animationFrameId = requestAnimationFrame(animate);
+    return () => {
+      timers.forEach(t => clearTimeout(t));
+      clearInterval(interval);
     };
-
-    animationFrameId = requestAnimationFrame(animate);
-    return () => cancelAnimationFrame(animationFrameId);
-  }, [isStopped, stopTimer, progress]);
-
-  const getBezierPos = (t: number) => {
-    const safeT = Math.max(0, Math.min(1, t));
-    const p0 = { x: 10, y: 20 };
-    const p1 = { x: 30, y: 90 };
-    const p2 = { x: 60, y: 90 };
-    const p3 = { x: 90, y: 30 };
-    const oneMinusT = 1 - safeT;
-    const x = Math.pow(oneMinusT, 3) * p0.x + 3 * Math.pow(oneMinusT, 2) * safeT * p1.x + 3 * oneMinusT * Math.pow(safeT, 2) * p2.x + Math.pow(safeT, 3) * p3.x;
-    const y = Math.pow(oneMinusT, 3) * p0.y + 3 * Math.pow(oneMinusT, 2) * safeT * p1.y + 3 * oneMinusT * Math.pow(safeT, 2) * p2.y + Math.pow(safeT, 3) * p3.y;
-    return { x, y };
-  };
-
-  const t = progress / 100;
-  const pos = getBezierPos(t);
-  const lookAheadPos = getBezierPos(Math.min(1, t + 0.01));
-  const angle = Math.atan2(lookAheadPos.y - pos.y, lookAheadPos.x - pos.x) * (180 / Math.PI);
+  }, [stage === 0]);
 
   return (
-    <div className="w-full h-full bg-[#e8eaf6] dark:bg-[#1a1a1a] relative overflow-hidden rounded-[2rem] border-4 border-dark dark:border-gray-700 shadow-2xl transition-colors duration-300">
-      <div className="absolute inset-0 opacity-10 dark:opacity-20" style={{ backgroundImage: 'linear-gradient(#9fa8da 1px, transparent 1px), linear-gradient(90deg, #9fa8da 1px, transparent 1px)', backgroundSize: '40px 40px' }}></div>
-      <div className="absolute top-[20%] left-[10%] text-[10px] font-black text-muted/50 uppercase tracking-widest">North Ind. Area</div>
-      <div className="absolute bottom-[10%] left-[30%] text-[10px] font-black text-muted/50 uppercase tracking-widest">Madina</div>
-      <div className="absolute bottom-[20%] right-[30%] text-[10px] font-black text-muted/50 uppercase tracking-widest">Spintex</div>
-      <div className="absolute top-[30%] right-[10%] text-[10px] font-black text-muted/50 uppercase tracking-widest">Tema Comm. 1</div>
-      <svg className="absolute inset-0 w-full h-full" viewBox="0 0 100 100" preserveAspectRatio="none">
-        <path d="M 10,20 C 30,90 60,90 90,30" fill="none" stroke="#cbd5e1" strokeWidth="12" strokeLinecap="round" className="dark:stroke-gray-700" />
-        <path d="M 10,20 C 30,90 60,90 90,30" fill="none" stroke="#fff" strokeWidth="8" strokeLinecap="round" className="dark:stroke-gray-600" />
-        <path d="M 10,20 C 30,90 60,90 90,30" fill="none" stroke="#fbbf24" strokeWidth="1" strokeDasharray="4 4" strokeLinecap="round" />
-      </svg>
-      <div className="absolute z-20 transition-transform duration-75 ease-linear will-change-transform" style={{ left: `${pos.x}%`, top: `${pos.y}%`, transform: `translate(-50%, -50%) rotate(${angle}deg)` }}>
-        <div className="relative">
-          {isStopped && <div className="absolute left-[-10px] top-1/2 -translate-y-1/2 w-8 h-8 bg-red-500/50 blur-md rounded-full animate-pulse"></div>}
-          <div className="w-16 h-9 bg-dark dark:bg-white rounded-lg shadow-2xl border border-white/20 flex items-center justify-between px-1 relative z-10">
-            <div className="w-4 h-6 bg-blue-300 dark:bg-blue-900 rounded-sm"></div>
-            <span className="text-[7px] font-black text-white dark:text-dark uppercase tracking-tighter">MyKart</span>
-            <div className={`w-1 h-6 ${isStopped ? 'bg-red-500 shadow-[0_0_10px_rgba(239,68,68,0.8)]' : 'bg-red-900'} rounded-full transition-colors duration-200`}></div>
-          </div>
-          {isStopped && (
-            <div className="absolute -top-20 left-1/2 -translate-x-1/2 bg-white dark:bg-gray-800 p-3 rounded-xl shadow-xl border-2 border-primary animate-in zoom-in slide-in-from-bottom-2 duration-300 min-w-[160px] z-50">
-               <div className="flex flex-col items-center text-center">
-                  <div className="flex items-center gap-1 mb-1">
-                    <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
-                    <span className="text-[10px] font-bold text-dark dark:text-white uppercase">Pickup Active</span>
-                  </div>
-                  <span className="text-xs font-black text-primary uppercase tracking-wider">{statusText.split(':')[1]}</span>
-                  <span className="text-[8px] text-muted dark:text-gray-400 mt-1">Departing in 2 mins...</span>
-               </div>
-               <div className="absolute bottom-[-8px] left-1/2 -translate-x-1/2 w-4 h-4 bg-white dark:bg-gray-800 border-b-2 border-r-2 border-primary rotate-45"></div>
+    <div className="w-full h-[500px] lg:h-[600px] bg-[#e8eaf6] dark:bg-[#1a1a1a] relative overflow-hidden rounded-[2rem] border-4 border-dark dark:border-gray-700 shadow-2xl transition-colors duration-300 font-sans select-none">
+      <div className="absolute inset-0 opacity-10 dark:opacity-20" 
+           style={{ backgroundImage: 'linear-gradient(#9fa8da 1px, transparent 1px), linear-gradient(90deg, #9fa8da 1px, transparent 1px)', backgroundSize: '40px 40px' }}></div>
+      
+      {/* STAGE 0: INTRO */}
+      <div className={`absolute inset-0 flex flex-col items-center justify-center transition-opacity duration-700 ${stage === 0 ? 'opacity-100 z-20' : 'opacity-0 z-0'}`}>
+         <div className="relative mb-8">
+            <div className="w-32 h-32 bg-primary/10 rounded-full flex items-center justify-center animate-[slideRight_3s_ease-in-out_infinite]">
+               <span className="material-symbols-outlined text-6xl text-primary">local_shipping</span>
             </div>
-          )}
-        </div>
+            <div className="absolute -bottom-4 left-[-100px] right-[-100px] h-2 bg-gray-300 dark:bg-gray-700 rounded-full overflow-hidden">
+               <div className="w-full h-full bg-dashed-line animate-[roadScroll_1s_linear_infinite]"></div>
+            </div>
+         </div>
+         <h2 className="text-4xl font-black text-dark dark:text-white mb-2 text-center">Kommunity Truck Delivery</h2>
+         <p className="text-lg text-muted dark:text-gray-400 font-medium tracking-wide">Community-powered grocery logistics</p>
       </div>
-      <div className="absolute bottom-6 left-6 right-6 bg-white/90 dark:bg-black/80 backdrop-blur-md p-4 rounded-2xl border border-gray-100 dark:border-white/10 shadow-lg flex justify-between items-center">
-         <div className="flex flex-col">
-            <span className="text-[10px] font-black text-muted dark:text-gray-400 uppercase tracking-widest">Live Status</span>
-            <span className="text-sm font-bold text-dark dark:text-white truncate max-w-[200px] md:max-w-none">{statusText}</span>
+
+      {/* STAGE 1: AREA DETECTION */}
+      <div className={`absolute inset-0 flex flex-col items-center justify-center bg-white/90 dark:bg-black/90 backdrop-blur-sm transition-opacity duration-700 ${stage === 1 ? 'opacity-100 z-20' : 'opacity-0 z-0'}`}>
+         <div className="w-20 h-20 bg-gray-100 dark:bg-white/10 rounded-full flex items-center justify-center mb-6 animate-bounce">
+            <span className="material-symbols-outlined text-4xl text-dark dark:text-white">location_on</span>
          </div>
-         <div className="hidden md:flex flex-col items-end">
-            <span className="text-[10px] font-black text-muted dark:text-gray-400 uppercase tracking-widest">Route ID</span>
-            <span className="text-xs font-mono text-primary">KART-ACC-004</span>
+         <h3 className="text-2xl font-bold text-dark dark:text-white mb-1">Your area: <span className="text-primary">Madina</span></h3>
+         <div className="mt-6 space-y-3 w-full max-w-sm px-6">
+            <div className="flex items-center gap-3 p-3 bg-red-50 dark:bg-red-900/20 border border-red-100 dark:border-red-900/30 rounded-xl opacity-60">
+               <span className="material-symbols-outlined text-red-500">block</span>
+               <span className="text-sm font-bold text-red-600 dark:text-red-400">Standard delivery unavailable</span>
+            </div>
+            <div className="flex items-center gap-3 p-4 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-900/30 rounded-xl shadow-lg transform scale-105 transition-transform">
+               <span className="material-symbols-outlined text-green-600 dark:text-green-400">check_circle</span>
+               <span className="text-sm font-bold text-green-700 dark:text-green-400">Kommunity Truck available</span>
+            </div>
          </div>
+      </div>
+
+      {/* STAGE 2: SCHEDULE VIEW */}
+      <div className={`absolute inset-0 flex flex-col items-center justify-center transition-all duration-700 ${stage === 2 ? 'translate-y-0 opacity-100 z-20' : 'translate-y-10 opacity-0 z-0'}`}>
+         <div className="w-full max-w-md bg-white dark:bg-[#232323] rounded-3xl shadow-2xl border border-gray-100 dark:border-white/10 overflow-hidden m-4">
+            <div className="bg-primary p-6 text-white text-center">
+               <h3 className="text-2xl font-black uppercase tracking-tight">Madina Kommunity Truck</h3>
+               <p className="text-white/80 text-sm font-medium mt-1">Scheduled Route</p>
+            </div>
+            <div className="p-8 space-y-6">
+               <div className="flex items-start gap-4">
+                  <div className="w-10 h-10 bg-gray-50 dark:bg-white/5 rounded-full flex items-center justify-center text-primary shrink-0">
+                     <span className="material-symbols-outlined">calendar_month</span>
+                  </div>
+                  <div>
+                     <p className="text-xs text-muted dark:text-gray-400 uppercase font-bold tracking-wider">Day & Time</p>
+                     <p className="text-lg font-black text-dark dark:text-white">Friday</p>
+                     <p className="text-sm font-medium text-dark dark:text-gray-300">4:00 PM – 7:00 PM</p>
+                  </div>
+               </div>
+               <div className="flex items-start gap-4">
+                  <div className="w-10 h-10 bg-gray-50 dark:bg-white/5 rounded-full flex items-center justify-center text-primary shrink-0">
+                     <span className="material-symbols-outlined">share_location</span>
+                  </div>
+                  <div>
+                     <p className="text-xs text-muted dark:text-gray-400 uppercase font-bold tracking-wider">Pickup Location</p>
+                     <p className="text-lg font-black text-dark dark:text-white">Madina Main Junction</p>
+                     <p className="text-xs text-orange-500 font-bold mt-1">Stop-based Pickup</p>
+                  </div>
+               </div>
+            </div>
+         </div>
+      </div>
+
+      {/* STAGE 3: JOINING TRUCK */}
+      <div className={`absolute inset-0 flex flex-col items-center justify-center bg-white/95 dark:bg-black/95 transition-opacity duration-500 ${stage === 3 ? 'opacity-100 z-20' : 'opacity-0 z-0'}`}>
+         <div className="relative w-32 h-32 flex items-center justify-center mb-8">
+            <div className="absolute inset-0 border-4 border-gray-100 dark:border-white/10 rounded-full"></div>
+            <div className="absolute inset-0 border-4 border-t-primary border-r-primary border-b-transparent border-l-transparent rounded-full animate-spin"></div>
+            <span className="material-symbols-outlined text-5xl text-dark dark:text-white animate-pulse">local_shipping</span>
+         </div>
+         <h3 className="text-2xl font-black text-dark dark:text-white mb-2 text-center">You're on the Truck!</h3>
+         <p className="text-muted dark:text-gray-400 mb-8 font-medium">Madina Friday Route</p>
+         <div className="flex items-center gap-3 bg-white dark:bg-white/10 px-6 py-3 rounded-full shadow-lg border border-gray-100 dark:border-white/10">
+            <div className="flex -space-x-2">
+               {[1,2,3].map(i => <div key={i} className="w-6 h-6 rounded-full bg-gray-300 border-2 border-white dark:border-gray-800"></div>)}
+            </div>
+            <span className="text-sm font-bold text-dark dark:text-white">27 community orders onboard</span>
+         </div>
+      </div>
+
+      {/* STAGE 4: PROCESSING */}
+      <div className={`absolute inset-0 flex flex-col items-center justify-center px-6 transition-all duration-700 ${stage === 4 ? 'opacity-100 z-20' : 'opacity-0 z-0'}`}>
+         <h3 className="text-xl font-black text-dark dark:text-white mb-10 tracking-tight">Order Processing</h3>
+         <div className="w-full max-w-lg relative">
+            <div className="absolute top-4 left-0 w-full h-1 bg-gray-200 dark:bg-gray-700 rounded-full"></div>
+            <div className={`absolute top-4 left-0 h-1 bg-primary rounded-full transition-all duration-[8000ms] ease-linear`} style={{ width: subTick > 1 ? '100%' : '10%' }}></div>
+            <div className="flex justify-between relative z-10 w-full">
+               <div className="flex flex-col items-center gap-2">
+                  <div className="w-9 h-9 bg-primary text-white rounded-full flex items-center justify-center shadow-lg transition-transform duration-500 scale-110">
+                     <span className="material-symbols-outlined text-sm">shopping_cart</span>
+                  </div>
+                  <span className="text-xs font-bold text-dark dark:text-white">Placed</span>
+               </div>
+               <div className="flex flex-col items-center gap-2">
+                  <div className={`w-9 h-9 rounded-full flex items-center justify-center shadow-lg transition-all duration-500 ${subTick > 2 ? 'bg-primary text-white scale-110' : 'bg-gray-200 dark:bg-gray-700 text-gray-400'}`}>
+                     <span className="material-symbols-outlined text-sm">inventory_2</span>
+                  </div>
+                  <span className={`text-xs font-bold transition-colors ${subTick > 2 ? 'text-dark dark:text-white' : 'text-gray-400'}`}>Packed</span>
+               </div>
+               <div className="flex flex-col items-center gap-2">
+                  <div className={`w-9 h-9 rounded-full flex items-center justify-center shadow-lg transition-all duration-500 ${subTick > 6 ? 'bg-primary text-white scale-110' : 'bg-gray-200 dark:bg-gray-700 text-gray-400'}`}>
+                     <span className="material-symbols-outlined text-sm">local_shipping</span>
+                  </div>
+                  <span className={`text-xs font-bold transition-colors ${subTick > 6 ? 'text-dark dark:text-white' : 'text-gray-400'}`}>Loaded</span>
+               </div>
+            </div>
+         </div>
+      </div>
+
+      {/* STAGE 5: EN ROUTE */}
+      <div className={`absolute inset-0 bg-[#e3f2fd] dark:bg-[#0f172a] transition-opacity duration-700 ${stage === 5 ? 'opacity-100 z-20' : 'opacity-0 z-0'}`}>
+         <div className="relative w-full h-full">
+            <svg className="absolute inset-0 w-full h-full p-10" viewBox="0 0 100 100" preserveAspectRatio="none">
+               <path d="M 10,50 L 90,50" stroke="#cbd5e1" strokeWidth="8" strokeLinecap="round" className="dark:stroke-gray-700" />
+               <path d="M 10,50 L 90,50" stroke="#fff" strokeWidth="4" strokeLinecap="round" strokeDasharray="8 8" className="dark:stroke-gray-600" />
+            </svg>
+            <div className="absolute left-[10%] top-1/2 -translate-y-1/2 -translate-x-1/2 flex flex-col items-center gap-2">
+               <div className="w-4 h-4 bg-gray-400 rounded-full"></div>
+               <span className="text-[10px] font-bold text-muted uppercase">Shoprite</span>
+            </div>
+            <div className="absolute right-[10%] top-1/2 -translate-y-1/2 translate-x-1/2 flex flex-col items-center gap-2">
+               <div className="w-6 h-6 bg-primary rounded-full border-4 border-white shadow-lg"></div>
+               <span className="text-xs font-black text-dark dark:text-white uppercase bg-white/80 dark:bg-black/50 px-2 rounded">Madina</span>
+            </div>
+            <div className="absolute top-1/2 -translate-y-1/2 transition-all duration-[14000ms] ease-linear"
+                 style={{ left: stage === 5 ? '85%' : '10%' }}>
+               <div className="bg-dark dark:bg-white text-white dark:text-dark p-2 rounded-lg shadow-xl flex items-center gap-2 transform -translate-x-1/2 -translate-y-8">
+                  <span className="material-symbols-outlined text-sm">local_shipping</span>
+                  <span className="text-xs font-bold whitespace-nowrap">En Route</span>
+               </div>
+            </div>
+         </div>
+      </div>
+
+      {/* STAGE 6: PICKUP */}
+      <div className={`absolute inset-0 flex flex-col items-center justify-center bg-primary transition-all duration-500 ${stage === 6 ? 'opacity-100 z-20' : 'opacity-0 z-0'}`}>
+         <div className="bg-white p-8 rounded-[2rem] shadow-2xl text-center max-w-xs w-full mx-4 relative overflow-hidden">
+            <div className="absolute top-0 left-0 w-full h-2 bg-green-500"></div>
+            <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4 text-green-600">
+               <span className="material-symbols-outlined text-4xl">flag</span>
+            </div>
+            <h3 className="text-2xl font-black text-dark mb-2">Truck Arrived!</h3>
+            <p className="text-sm text-muted font-medium mb-6">At Madina Main Junction</p>
+            <div className="bg-gray-100 p-4 rounded-xl border border-dashed border-gray-300 mb-4">
+               <p className="text-[10px] text-muted uppercase font-bold mb-1">Your Pickup Code</p>
+               <p className="text-3xl font-mono font-black text-dark tracking-widest">88-2A</p>
+            </div>
+         </div>
+      </div>
+
+      {/* STAGE 7: END */}
+      <div className={`absolute inset-0 flex flex-col items-center justify-center bg-dark dark:bg-black transition-opacity duration-700 ${stage === 7 ? 'opacity-100 z-20' : 'opacity-0 z-0'}`}>
+         <div className="text-center px-8">
+            <h2 className="text-3xl md:text-5xl font-black text-white mb-6 leading-tight">
+               Lower Costs.<br/>
+               <span className="text-primary">Less Traffic.</span>
+            </h2>
+            <div className="inline-flex items-center gap-2 px-6 py-3 bg-white/10 rounded-full border border-white/20">
+               <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
+               <span className="text-sm font-bold text-white uppercase tracking-widest">Restarting Demo...</span>
+            </div>
+         </div>
+      </div>
+
+      {/* TIMELINE BAR */}
+      <div className="absolute bottom-0 left-0 w-full h-1 bg-gray-200 dark:bg-gray-800 z-50">
+         <div 
+            className="h-full bg-primary transition-all duration-[1000ms] ease-linear"
+            style={{ width: `${(stage / 7) * 100}%` }}
+         ></div>
       </div>
     </div>
   );
 };
 
-// --- COMPONENT 2: ROOMMATE GROUP ORDER SIMULATION (AUTO-PLAY) ---
+// --- COMPONENT 2: ROOMMATE APP SIM (Auto-Play) ---
 const RoommateAppSim: React.FC = () => {
   const [stage, setStage] = useState(0); 
-  // Stages: 0=Intro, 1=AddingItems, 2=CartSummary, 3=SplitBill, 4=Paying, 5=Success
-
   useEffect(() => {
-    // Timeline of the simulation (total loop ~20s)
     const timers = [
-      setTimeout(() => setStage(1), 2500),  // Go to Adding Items
-      setTimeout(() => setStage(2), 8500),  // Go to Cart Summary (after items added)
-      setTimeout(() => setStage(3), 11500), // Go to Bill Split
-      setTimeout(() => setStage(4), 15000), // Go to Payment Processing
-      setTimeout(() => setStage(5), 18000), // Go to Success
-      setTimeout(() => setStage(0), 22000), // Reset Loop
+      setTimeout(() => setStage(1), 2500),  
+      setTimeout(() => setStage(2), 8500),  
+      setTimeout(() => setStage(3), 11500), 
+      setTimeout(() => setStage(4), 15000), 
+      setTimeout(() => setStage(5), 18000), 
+      setTimeout(() => setStage(0), 22000), 
     ];
     return () => timers.forEach(t => clearTimeout(t));
-  }, [stage === 0]); // Only re-run when stage resets to 0
+  }, [stage === 0]);
 
   return (
     <div className="bg-white dark:bg-[#121212] w-full max-w-[350px] mx-auto h-[600px] rounded-[3rem] border-[8px] border-dark dark:border-gray-700 shadow-2xl relative overflow-hidden flex flex-col font-sans transition-colors duration-300">
-       {/* Phone Status Bar */}
        <div className="h-8 bg-transparent w-full flex justify-between items-center px-6 pt-3 relative z-20">
           <span className="text-[10px] font-bold text-dark dark:text-white">9:41</span>
           <div className="flex gap-1">
@@ -142,19 +233,16 @@ const RoommateAppSim: React.FC = () => {
              <div className="w-4 h-4 bg-dark dark:bg-white rounded-full opacity-20"></div>
           </div>
        </div>
-
-       {/* APP HEADER */}
        <div className="px-6 pt-4 pb-4 border-b border-gray-100 dark:border-white/5 relative z-10 bg-white dark:bg-[#121212]">
           <div className="flex items-center gap-2 mb-1">
              <div className="w-8 h-8 bg-primary rounded-full flex items-center justify-center text-white">
                 <span className="material-symbols-outlined text-sm">home</span>
              </div>
              <div>
-                <h3 className="text-sm font-black text-dark dark:text-white leading-none">Legon Flatmates 🏠</h3>
+                <h3 className="text-sm font-black text-dark dark:text-white leading-none">Pent Block B: 456 🏠</h3>
                 <p className="text-[10px] text-muted dark:text-gray-400">Shoprite • East Legon</p>
              </div>
           </div>
-          {/* Avatars */}
           <div className="flex -space-x-2 mt-2">
              <div className="w-6 h-6 rounded-full bg-blue-500 border-2 border-white dark:border-dark flex items-center justify-center text-[8px] text-white font-bold">AM</div>
              <div className="w-6 h-6 rounded-full bg-purple-500 border-2 border-white dark:border-dark flex items-center justify-center text-[8px] text-white font-bold">KJ</div>
@@ -162,16 +250,10 @@ const RoommateAppSim: React.FC = () => {
              <div className="w-6 h-6 rounded-full bg-gray-100 dark:bg-white/10 border-2 border-white dark:border-dark flex items-center justify-center text-[8px] text-muted font-bold">+</div>
           </div>
        </div>
-
-       {/* MAIN CONTENT AREA - SCROLLABLE */}
        <div className="flex-1 bg-gray-50 dark:bg-white/5 p-4 relative overflow-hidden">
-          
-          {/* STAGE 0 & 1: LIVE FEED */}
           <div className={`absolute inset-0 p-4 transition-all duration-500 ${stage <= 1 ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-full'}`}>
              <p className="text-[10px] font-bold text-muted/60 dark:text-gray-500 uppercase tracking-widest mb-4 text-center">Live Activity</p>
-             
              <div className="space-y-3">
-                {/* Item 1 */}
                 <div className={`flex items-center gap-3 bg-white dark:bg-white/5 p-3 rounded-2xl shadow-sm border border-gray-100 dark:border-white/5 transition-all duration-500 ${stage >= 1 ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'}`}>
                    <div className="w-10 h-10 bg-orange-50 rounded-xl flex items-center justify-center text-xl">🍚</div>
                    <div className="flex-1">
@@ -180,8 +262,6 @@ const RoommateAppSim: React.FC = () => {
                    </div>
                    <span className="text-xs font-black text-dark dark:text-white">GH₵70</span>
                 </div>
-
-                {/* Item 2 - Delayed */}
                 <div className={`flex items-center gap-3 bg-white dark:bg-white/5 p-3 rounded-2xl shadow-sm border border-gray-100 dark:border-white/5 transition-all duration-500 delay-700 ${stage >= 1 ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'}`}>
                    <div className="w-10 h-10 bg-yellow-50 rounded-xl flex items-center justify-center text-xl">🥚</div>
                    <div className="flex-1">
@@ -190,8 +270,6 @@ const RoommateAppSim: React.FC = () => {
                    </div>
                    <span className="text-xs font-black text-dark dark:text-white">GH₵60</span>
                 </div>
-
-                {/* Item 3 - Delayed */}
                 <div className={`flex items-center gap-3 bg-white dark:bg-white/5 p-3 rounded-2xl shadow-sm border border-gray-100 dark:border-white/5 transition-all duration-500 delay-[1500ms] ${stage >= 1 ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'}`}>
                    <div className="w-10 h-10 bg-red-50 rounded-xl flex items-center justify-center text-xl">🍜</div>
                    <div className="flex-1">
@@ -202,13 +280,9 @@ const RoommateAppSim: React.FC = () => {
                 </div>
              </div>
           </div>
-
-          {/* STAGE 2 & 3 & 4: BILL SPLIT */}
           <div className={`absolute inset-0 p-4 transition-all duration-500 ${stage >= 2 && stage < 5 ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-full'}`}>
              <p className="text-[10px] font-bold text-muted/60 dark:text-gray-500 uppercase tracking-widest mb-4 text-center">Smart Split Breakdown</p>
-             
              <div className="bg-white dark:bg-white/5 rounded-2xl border border-gray-100 dark:border-white/5 p-4 shadow-sm space-y-4">
-                {/* Ama Row */}
                 <div className="flex justify-between items-center">
                    <div className="flex items-center gap-2">
                       <div className="w-6 h-6 rounded-full bg-blue-500 text-white flex items-center justify-center text-[8px] font-bold">AM</div>
@@ -223,8 +297,6 @@ const RoommateAppSim: React.FC = () => {
                       )}
                    </div>
                 </div>
-
-                {/* Kojo Row */}
                 <div className="flex justify-between items-center">
                    <div className="flex items-center gap-2">
                       <div className="w-6 h-6 rounded-full bg-purple-500 text-white flex items-center justify-center text-[8px] font-bold">KJ</div>
@@ -239,8 +311,6 @@ const RoommateAppSim: React.FC = () => {
                       )}
                    </div>
                 </div>
-
-                {/* You Row */}
                 <div className="flex justify-between items-center bg-green-50 dark:bg-green-900/20 p-2 rounded-lg -mx-2">
                    <div className="flex items-center gap-2">
                       <div className="w-6 h-6 rounded-full bg-green-500 text-white flex items-center justify-center text-[8px] font-bold">ME</div>
@@ -255,15 +325,12 @@ const RoommateAppSim: React.FC = () => {
                       )}
                    </div>
                 </div>
-                
                 <div className="border-t border-dashed border-gray-200 pt-2 mt-2 flex justify-between">
                    <span className="text-xs font-bold text-muted dark:text-gray-400">Total Cart</span>
                    <span className="text-sm font-black text-dark dark:text-white">GH₵ 210.00</span>
                 </div>
              </div>
           </div>
-
-          {/* STAGE 5: SUCCESS */}
           <div className={`absolute inset-0 flex flex-col items-center justify-center p-6 text-center transition-all duration-500 ${stage === 5 ? 'opacity-100 scale-100' : 'opacity-0 scale-90'}`}>
              <div className="w-20 h-20 bg-green-500 rounded-full flex items-center justify-center text-white mb-4 shadow-xl shadow-green-200 dark:shadow-none animate-bounce">
                 <span className="material-symbols-outlined text-4xl">local_shipping</span>
@@ -276,11 +343,8 @@ const RoommateAppSim: React.FC = () => {
              </div>
           </div>
        </div>
-       
-       {/* APP FOOTER (SIMULATED) */}
        <div className="bg-white dark:bg-[#121212] p-4 border-t border-gray-100 dark:border-white/5 flex justify-between items-center relative z-10">
           <div className="flex flex-col gap-1 w-full">
-              {/* Progress Bar for Demo */}
               <div className="h-1 w-full bg-gray-100 dark:bg-white/10 rounded-full overflow-hidden">
                  <div 
                    className="h-full bg-primary transition-all duration-[500ms] ease-linear"
@@ -303,7 +367,6 @@ const RoommateAppSim: React.FC = () => {
 // --- COMPONENT 3: GHANA CARD MOCK DATA SIM ---
 const GhanaCardSim: React.FC = () => {
   const [stage, setStage] = useState(0); 
-
   useEffect(() => {
     const interval = setInterval(() => {
       setStage(prev => (prev + 1) % 3);
@@ -320,7 +383,6 @@ const GhanaCardSim: React.FC = () => {
           <h4 className="font-bold text-dark dark:text-white">Identity Verification</h4>
           <p className="text-xs text-muted dark:text-gray-300">NIA Database Integration</p>
        </div>
-       
        <div className="flex-1 bg-gray-50 dark:bg-black/20 rounded-xl relative flex items-center justify-center overflow-hidden border border-gray-100 dark:border-white/5 p-4">
           <div className={`w-full max-w-[200px] bg-white dark:bg-gray-800 rounded-lg shadow-sm p-3 transition-all duration-500 ${stage === 2 ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4 absolute'}`}>
              <div className="flex items-center gap-2 mb-3 border-b border-gray-100 dark:border-white/10 pb-2">
@@ -366,6 +428,7 @@ const GhanaCardSim: React.FC = () => {
   );
 };
 
+// --- MAIN COMPONENT ---
 const Wireframes: React.FC = () => {
   const scrollRef = useRef<HTMLDivElement>(null);
   
@@ -443,11 +506,11 @@ const Wireframes: React.FC = () => {
           <div className="absolute inset-y-0 right-0 w-24 md:w-32 bg-gradient-to-l from-bg-light dark:from-[#23170f] to-transparent z-10 pointer-events-none"></div>
         </div>
 
-        {/* --- ROOMMATE RUN SPOTLIGHT (REPLACED WITH LIVE DEMO) --- */}
+        {/* --- ROOMMATE RUN SPOTLIGHT (WITH RESTORED IMAGE AND SIMULATION UNDER) --- */}
         <section className="mx-auto max-w-6xl px-4">
            <div className="bg-[#FFF8F0] dark:bg-white/5 rounded-[3rem] p-8 md:p-16 overflow-hidden border border-orange-100 dark:border-white/10 relative transition-colors">
-             <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center relative z-10">
-                <div className="order-2 lg:order-1">
+             <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-start relative z-10">
+                <div className="order-2 lg:order-1 self-center">
                    <div className="inline-flex items-center gap-2 px-4 py-2 bg-white dark:bg-white/10 text-primary font-bold rounded-full text-sm mb-6 shadow-sm border border-orange-100 dark:border-white/5">
                       <span className="relative flex h-3 w-3">
                         <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
@@ -484,8 +547,26 @@ const Wireframes: React.FC = () => {
                       </div>
                    </div>
                 </div>
-                {/* --- REPLACED STATIC IMAGE WITH INTERACTIVE DEMO --- */}
-                <div className="order-1 lg:order-2 flex justify-center">
+                
+                {/* --- RIGHT COLUMN: IMAGE FIRST, THEN SIMULATION --- */}
+                <div className="order-1 lg:order-2 flex flex-col items-center gap-12">
+                   {/* 1. Static Image (Restored) */}
+                   <div className="relative w-[280px] rotate-3 hover:rotate-0 transition-all duration-500">
+                      <img 
+                        src="https://raw.githubusercontent.com/princessasabea/princess-website/a73b75287274cf45ce2f7e2de7ef9914b9ed6f28/public/legonroomate.png" 
+                        alt="MyKart Roommate Run Feature Screen" 
+                        className="w-full rounded-[2.5rem] shadow-2xl border-8 border-white dark:border-gray-800"
+                      />
+                   </div>
+
+                   {/* 2. Divider/Label */}
+                   <div className="flex items-center gap-4 w-full justify-center opacity-50">
+                      <span className="h-px w-12 bg-dark dark:bg-white"></span>
+                      <span className="text-[10px] font-black uppercase text-dark dark:text-white tracking-widest">Live Interactive Demo</span>
+                      <span className="h-px w-12 bg-dark dark:bg-white"></span>
+                   </div>
+
+                   {/* 3. Interactive Simulation */}
                    <div className="relative w-full max-w-[350px]">
                       <RoommateAppSim />
                    </div>
@@ -499,8 +580,7 @@ const Wireframes: React.FC = () => {
         <div className="max-w-6xl mx-auto px-4 w-full">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
                <GhanaCardSim />
-               {/* Note: Removed duplicate RoommateSplitSim since it's now the main hero demo above */}
-               <div className="bg-gradient-to-br from-primary to-orange-600 rounded-3xl p-8 flex flex-col justify-between text-white shadow-lg relative overflow-hidden h-full">
+               <div className="bg-gradient-to-br from-primary to-orange-600 rounded-3xl p-8 flex flex-col justify-between text-white shadow-lg relative overflow-hidden h-full min-h-[300px]">
                   <div className="relative z-10">
                     <h3 className="text-2xl font-black mb-2">Join the Pilot</h3>
                     <p className="text-white/80 text-sm mb-6">Be the first to test Roommate Run on your campus.</p>
@@ -522,30 +602,30 @@ const Wireframes: React.FC = () => {
                <div className="absolute -top-40 -left-40 w-96 h-96 bg-primary/5 dark:bg-primary/10 rounded-full blur-[100px] pointer-events-none"></div>
                <div className="space-y-10 relative z-10">
                   <div className="inline-flex items-center gap-3 px-5 py-2 bg-primary/10 dark:bg-primary/20 rounded-full border border-primary/20">
-                    <span className="material-symbols-outlined text-primary text-[20px] animate-pulse">near_me</span>
-                    <span className="text-xs font-black text-primary uppercase tracking-[0.3em]">Live Interaction Mockup</span>
+                    <span className="material-symbols-outlined text-primary text-[20px] animate-pulse">local_shipping</span>
+                    <span className="text-xs font-black text-primary uppercase tracking-[0.3em]">User Journey Demo</span>
                   </div>
                   <h2 className="text-5xl md:text-7xl font-black text-dark dark:text-white leading-[0.9] tracking-tighter">
                     Kommunity <br/> <span className="text-primary italic">Truck.</span>
                   </h2>
                   <p className="text-xl text-muted dark:text-gray-300 leading-relaxed font-medium max-w-md">
-                    We've built an intuitive visual feedback system for our mobile hubs. 
-                    Monitor the K-Truck route exactly as it navigates your neighborhood.
+                    Experience the complete lifecycle of a community order. 
+                    From area detection to final pickup, see how we group orders to save you money.
                   </p>
                   <div className="flex gap-6 pt-4">
                      <div className="flex flex-col">
-                        <span className="text-4xl font-black text-dark dark:text-white">100%</span>
-                        <span className="text-[10px] font-black text-muted dark:text-gray-300 uppercase tracking-widest">Transparency</span>
+                        <span className="text-4xl font-black text-dark dark:text-white">70s</span>
+                        <span className="text-[10px] font-black text-muted dark:text-gray-300 uppercase tracking-widest">Full Cycle</span>
                      </div>
                      <div className="w-px h-12 bg-gray-200 dark:bg-white/10"></div>
                      <div className="flex flex-col">
-                        <span className="text-4xl font-black text-dark dark:text-white">&lt;1m</span>
-                        <span className="text-[10px] font-black text-muted dark:text-gray-300 uppercase tracking-widest">GPS Accuracy</span>
+                        <span className="text-4xl font-black text-dark dark:text-white">Auto</span>
+                        <span className="text-[10px] font-black text-muted dark:text-gray-300 uppercase tracking-widest">Simulation</span>
                      </div>
                   </div>
                </div>
-               <div className="h-[500px] lg:h-[650px] w-full">
-                  <LiveTruckMap />
+               <div className="w-full">
+                  <KommunityTruckJourney />
                </div>
             </div>
             <div id="planned-routes" className="bg-bg-light/50 dark:bg-black/20 border-t border-gray-100 dark:border-white/10 py-16">
