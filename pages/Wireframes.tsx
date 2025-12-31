@@ -1,58 +1,76 @@
 import React, { useState, useEffect, useRef } from 'react';
 import TruckSchedule from './TruckSchedule';
 
-// --- COMPONENT 1: REALISTIC TRUCK SIMULATION WITH STOPS ---
+// --- COMPONENT 1: REAL ACCRA ROUTE SIMULATION ---
 const LiveTruckMap: React.FC = () => {
   const [progress, setProgress] = useState(0);
   const [isStopped, setIsStopped] = useState(false);
   const [stopTimer, setStopTimer] = useState(0);
+  const [statusText, setStatusText] = useState("Loading Route...");
 
-  // Stop point (percentage of path)
-  const STOP_POINT = 48; // Stops near the middle (Accra Mall)
+  // We define stops at specific percentages of the path
+  const STOPS = [
+    { percent: 5, name: "Melcom Depot", area: "North Ind. Area" },
+    { percent: 45, name: "A&C Mall", area: "East Legon" }, // Major Stop
+    { percent: 90, name: "Community 1", area: "Tema" }
+  ];
 
   useEffect(() => {
     let animationFrameId: number;
     
     const animate = () => {
+      // 1. Handle Stopping Logic
       if (isStopped) {
-        // Truck is waiting at the mall
         if (Date.now() > stopTimer) {
-           setIsStopped(false); // Resume driving
+           setIsStopped(false); // Resume driving after wait
         }
       } else {
+        // 2. Move Truck
         setProgress((prev) => {
-          // Check if we reached the stop point and haven't stopped yet recently
-          // We use a small range logic to catch the frame
-          if (prev >= STOP_POINT && prev < STOP_POINT + 0.5 && stopTimer === 0) {
+          let nextProgress = prev + 0.12; // Speed
+
+          // Loop Route
+          if (nextProgress >= 100) nextProgress = 0;
+
+          // Check if we need to stop (only if we haven't stopped recently)
+          const stopLocation = STOPS.find(s => Math.abs(s.percent - nextProgress) < 0.5);
+          if (stopLocation && stopTimer === 0) {
             setIsStopped(true);
             setStopTimer(Date.now() + 3000); // Stop for 3 seconds
-            return STOP_POINT;
+            // Snap to exact spot
+            return stopLocation.percent;
           }
 
-          // Reset stop timer if we are past the point (looping back)
-          if (prev < STOP_POINT) {
+          // Reset stop timer if we are moving away
+          if (!stopLocation) {
              setStopTimer(0);
           }
 
-          // Loop seamlessly
-          if (prev >= 100) return 0;
-          return prev + 0.15; // Speed
+          return nextProgress;
         });
       }
+
+      // 3. Update Status Text based on location
+      if (progress < 25) setStatusText("Departing: Melcom Warehouse");
+      else if (progress < 40) setStatusText("En Route: Madina Zongo Jxn");
+      else if (progress < 50) setStatusText("Arriving: East Legon Hub");
+      else if (progress < 75) setStatusText("Heading to: Spintex Road");
+      else setStatusText("Final Stretch: Tema Motorway");
+
       animationFrameId = requestAnimationFrame(animate);
     };
 
     animationFrameId = requestAnimationFrame(animate);
     return () => cancelAnimationFrame(animationFrameId);
-  }, [isStopped, stopTimer]);
+  }, [isStopped, stopTimer, progress]);
 
-  // Cubic Bezier Path Logic
+  // Cubic Bezier Path: Starts Top-Left (Ind Area), Dips to Madina, Curves to E.Legon, then Tema
   const getBezierPos = (t: number) => {
     const safeT = Math.max(0, Math.min(1, t));
-    const p0 = { x: -10, y: 80 }; 
-    const p1 = { x: 40, y: 80 }; 
-    const p2 = { x: 60, y: 20 };  
-    const p3 = { x: 110, y: 20 }; 
+    const p0 = { x: 10, y: 20 };  // Melcom North Ind.
+    const p1 = { x: 30, y: 90 };  // Madina/Adenta Curve
+    const p2 = { x: 60, y: 90 };  // Spintex Road
+    const p3 = { x: 90, y: 30 };  // Tema
     
     const oneMinusT = 1 - safeT;
     const x = Math.pow(oneMinusT, 3) * p0.x + 3 * Math.pow(oneMinusT, 2) * safeT * p1.x + 3 * oneMinusT * Math.pow(safeT, 2) * p2.x + Math.pow(safeT, 3) * p3.x;
@@ -63,65 +81,81 @@ const LiveTruckMap: React.FC = () => {
   const t = progress / 100;
   const pos = getBezierPos(t);
   
-  // Rotation calculation
+  // Rotation
   const lookAheadPos = getBezierPos(Math.min(1, t + 0.01));
   const angle = Math.atan2(lookAheadPos.y - pos.y, lookAheadPos.x - pos.x) * (180 / Math.PI);
 
   return (
-    <div className="w-full h-full bg-[#e5e7eb] dark:bg-[#1a1a1a] relative overflow-hidden rounded-[2rem] border-4 border-dark dark:border-gray-700 shadow-2xl transition-colors duration-300">
-      <div className="absolute inset-0 opacity-10 dark:opacity-20" style={{ backgroundImage: 'linear-gradient(#000 1px, transparent 1px), linear-gradient(90deg, #000 1px, transparent 1px)', backgroundSize: '40px 40px' }}></div>
+    <div className="w-full h-full bg-[#e8eaf6] dark:bg-[#1a1a1a] relative overflow-hidden rounded-[2rem] border-4 border-dark dark:border-gray-700 shadow-2xl transition-colors duration-300">
+      {/* Map Background Pattern */}
+      <div className="absolute inset-0 opacity-10 dark:opacity-20" style={{ backgroundImage: 'linear-gradient(#9fa8da 1px, transparent 1px), linear-gradient(90deg, #9fa8da 1px, transparent 1px)', backgroundSize: '40px 40px' }}></div>
       
-      {/* Map Landmarks */}
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 flex flex-col items-center z-0">
-         <div className="w-32 h-24 bg-gray-300 dark:bg-white/5 rounded-xl border-2 border-black/5 mb-2"></div>
-         <span className="text-[10px] font-black uppercase text-muted tracking-widest">Accra Mall Hub</span>
-      </div>
+      {/* City Labels (Static) */}
+      <div className="absolute top-[20%] left-[10%] text-[10px] font-black text-muted/50 uppercase tracking-widest">North Ind. Area</div>
+      <div className="absolute bottom-[10%] left-[30%] text-[10px] font-black text-muted/50 uppercase tracking-widest">Madina</div>
+      <div className="absolute bottom-[20%] right-[30%] text-[10px] font-black text-muted/50 uppercase tracking-widest">Spintex</div>
+      <div className="absolute top-[30%] right-[10%] text-[10px] font-black text-muted/50 uppercase tracking-widest">Tema Comm. 1</div>
 
-      {/* Road */}
+      {/* Road Path */}
       <svg className="absolute inset-0 w-full h-full" viewBox="0 0 100 100" preserveAspectRatio="none">
-        <path d="M -10,80 C 40,80 60,20 110,20" fill="none" stroke="#a0aec0" strokeWidth="12" strokeLinecap="round" />
-        <path d="M -10,80 C 40,80 60,20 110,20" fill="none" stroke="#4a5568" strokeWidth="10" strokeLinecap="round" />
-        <path d="M -10,80 C 40,80 60,20 110,20" fill="none" stroke="#fbbf24" strokeWidth="1" strokeDasharray="4 4" strokeLinecap="round" />
+        <path d="M 10,20 C 30,90 60,90 90,30" fill="none" stroke="#cbd5e1" strokeWidth="12" strokeLinecap="round" className="dark:stroke-gray-700" />
+        <path d="M 10,20 C 30,90 60,90 90,30" fill="none" stroke="#fff" strokeWidth="8" strokeLinecap="round" className="dark:stroke-gray-600" />
+        <path d="M 10,20 C 30,90 60,90 90,30" fill="none" stroke="#fbbf24" strokeWidth="1" strokeDasharray="4 4" strokeLinecap="round" />
       </svg>
 
       {/* The Truck */}
       <div className="absolute z-20 transition-transform duration-75 ease-linear will-change-transform"
            style={{ left: `${pos.x}%`, top: `${pos.y}%`, transform: `translate(-50%, -50%) rotate(${angle}deg)` }}>
         <div className="relative">
-          {/* Brake Lights when stopped */}
+          {/* Brake Lights */}
           {isStopped && <div className="absolute left-[-10px] top-1/2 -translate-y-1/2 w-8 h-8 bg-red-500/50 blur-md rounded-full animate-pulse"></div>}
           
-          <div className="w-14 h-8 bg-white dark:bg-gray-800 rounded-md shadow-2xl border border-gray-300 dark:border-gray-600 flex items-center justify-between px-1 relative z-10">
-            <div className="w-3 h-6 bg-blue-200 dark:bg-blue-900/50 rounded-sm"></div>
-            <span className="text-[8px] font-black text-dark dark:text-white uppercase tracking-tighter">MyKart</span>
+          <div className="w-16 h-9 bg-dark dark:bg-white rounded-lg shadow-2xl border border-white/20 flex items-center justify-between px-1 relative z-10">
+            <div className="w-4 h-6 bg-blue-300 dark:bg-blue-900 rounded-sm"></div>
+            <span className="text-[7px] font-black text-white dark:text-dark uppercase tracking-tighter">MyKart</span>
             <div className={`w-1 h-6 ${isStopped ? 'bg-red-500 shadow-[0_0_10px_rgba(239,68,68,0.8)]' : 'bg-red-900'} rounded-full transition-colors duration-200`}></div>
           </div>
           
-          {/* "Pickup Available" Popup */}
+          {/* Stop Popup Bubble */}
           {isStopped && (
-            <div className="absolute -top-16 left-1/2 -translate-x-1/2 bg-white dark:bg-gray-800 p-2 rounded-xl shadow-xl border border-primary animate-in zoom-in slide-in-from-bottom-2 duration-300 min-w-[140px]">
+            <div className="absolute -top-20 left-1/2 -translate-x-1/2 bg-white dark:bg-gray-800 p-3 rounded-xl shadow-xl border-2 border-primary animate-in zoom-in slide-in-from-bottom-2 duration-300 min-w-[160px] z-50">
                <div className="flex flex-col items-center text-center">
-                  <span className="text-xs font-black text-primary uppercase tracking-wider">Accra Mall</span>
-                  <span className="text-[10px] font-bold text-dark dark:text-white">Available for Pickup!</span>
-                  <span className="text-[8px] text-muted dark:text-gray-400">Truck departs in 3s...</span>
+                  <div className="flex items-center gap-1 mb-1">
+                    <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
+                    <span className="text-[10px] font-bold text-dark dark:text-white uppercase">Pickup Active</span>
+                  </div>
+                  <span className="text-xs font-black text-primary uppercase tracking-wider">{statusText.split(':')[1]}</span>
+                  <span className="text-[8px] text-muted dark:text-gray-400 mt-1">Departing in 2 mins...</span>
                </div>
-               <div className="absolute bottom-[-6px] left-1/2 -translate-x-1/2 w-3 h-3 bg-white dark:bg-gray-800 border-b border-r border-primary rotate-45"></div>
+               <div className="absolute bottom-[-8px] left-1/2 -translate-x-1/2 w-4 h-4 bg-white dark:bg-gray-800 border-b-2 border-r-2 border-primary rotate-45"></div>
             </div>
           )}
         </div>
+      </div>
+
+      {/* Floating HUD Panel */}
+      <div className="absolute bottom-6 left-6 right-6 bg-white/90 dark:bg-black/80 backdrop-blur-md p-4 rounded-2xl border border-gray-100 dark:border-white/10 shadow-lg flex justify-between items-center">
+         <div className="flex flex-col">
+            <span className="text-[10px] font-black text-muted dark:text-gray-400 uppercase tracking-widest">Live Status</span>
+            <span className="text-sm font-bold text-dark dark:text-white truncate max-w-[200px] md:max-w-none">{statusText}</span>
+         </div>
+         <div className="hidden md:flex flex-col items-end">
+            <span className="text-[10px] font-black text-muted dark:text-gray-400 uppercase tracking-widest">Route ID</span>
+            <span className="text-xs font-mono text-primary">KART-ACC-004</span>
+         </div>
       </div>
     </div>
   );
 };
 
-// --- COMPONENT 2: GHANA CARD VERIFICATION SIMULATION ---
+// --- COMPONENT 2: GHANA CARD MOCK DATA SIM ---
 const GhanaCardSim: React.FC = () => {
-  const [stage, setStage] = useState(0); // 0: Idle, 1: Scanning, 2: Verified
+  const [stage, setStage] = useState(0); // 0: Idle, 1: Scanning, 2: Extracting
 
   useEffect(() => {
     const interval = setInterval(() => {
       setStage(prev => (prev + 1) % 3);
-    }, 3000); // Cycle every 3 seconds
+    }, 4000); 
     return () => clearInterval(interval);
   }, []);
 
@@ -129,33 +163,60 @@ const GhanaCardSim: React.FC = () => {
     <div className="bg-white dark:bg-white/5 rounded-3xl p-6 border border-gray-100 dark:border-white/10 shadow-sm relative overflow-hidden h-full flex flex-col">
        <div className="mb-4">
           <div className="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center text-primary mb-2">
-             <span className="material-symbols-outlined">id_card</span>
+             <span className="material-symbols-outlined">fingerprint</span>
           </div>
-          <h4 className="font-bold text-dark dark:text-white">Instant Verification</h4>
+          <h4 className="font-bold text-dark dark:text-white">Identity Verification</h4>
           <p className="text-xs text-muted dark:text-gray-300">NIA Database Integration</p>
        </div>
        
-       <div className="flex-1 bg-gray-50 dark:bg-black/20 rounded-xl relative flex items-center justify-center overflow-hidden border border-gray-100 dark:border-white/5">
-          {/* Card Graphic */}
-          <div className={`w-40 h-24 bg-gradient-to-br from-green-600 to-yellow-500 rounded-xl shadow-lg relative transition-all duration-500 ${stage === 2 ? 'scale-95 blur-[1px]' : 'scale-100'}`}>
+       <div className="flex-1 bg-gray-50 dark:bg-black/20 rounded-xl relative flex items-center justify-center overflow-hidden border border-gray-100 dark:border-white/5 p-4">
+          
+          {/* Mock UI: Extracted Data View */}
+          <div className={`w-full max-w-[200px] bg-white dark:bg-gray-800 rounded-lg shadow-sm p-3 transition-all duration-500 ${stage === 2 ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4 absolute'}`}>
+             <div className="flex items-center gap-2 mb-3 border-b border-gray-100 dark:border-white/10 pb-2">
+                <img src="/logo.png" className="w-4 h-4 opacity-50" alt="" />
+                <span className="text-[10px] font-bold text-gray-400">NIA DATA PREVIEW</span>
+             </div>
+             <div className="space-y-2">
+                <div>
+                   <div className="text-[8px] text-gray-400 uppercase">Surname</div>
+                   <div className="h-3 w-16 bg-gray-200 dark:bg-white/10 rounded animate-pulse"></div>
+                </div>
+                <div>
+                   <div className="text-[8px] text-gray-400 uppercase">First Name</div>
+                   <div className="h-3 w-20 bg-gray-200 dark:bg-white/10 rounded animate-pulse delay-75"></div>
+                </div>
+                <div>
+                   <div className="text-[8px] text-gray-400 uppercase">Card ID</div>
+                   <div className="flex items-center gap-1">
+                      <span className="text-[10px] font-mono text-dark dark:text-white">GHA-72</span>
+                      <div className="h-2 w-12 bg-gray-200 dark:bg-white/10 rounded blur-[2px]"></div>
+                   </div>
+                </div>
+             </div>
+             <div className="mt-3 pt-2 border-t border-gray-100 dark:border-white/10 flex justify-between items-center">
+                 <span className="text-[8px] text-green-500 font-bold">MATCH FOUND</span>
+                 <span className="material-symbols-outlined text-[12px] text-green-500">verified</span>
+             </div>
+          </div>
+
+          {/* The Physical Card Graphic (Visible in Stage 0 & 1) */}
+          <div className={`w-40 h-24 bg-gradient-to-br from-[#2F855A] to-[#ECC94B] rounded-xl shadow-lg relative transition-all duration-500 ${stage === 2 ? 'opacity-0 scale-90 absolute' : 'opacity-100 scale-100'}`}>
              <div className="absolute top-2 left-2 w-8 h-8 bg-gray-200/50 rounded-full"></div>
              <div className="absolute top-4 right-2 w-16 h-2 bg-white/30 rounded-full"></div>
              <div className="absolute bottom-2 left-2 w-24 h-2 bg-white/30 rounded-full"></div>
+             {/* EcoWAS Logo Mock */}
+             <div className="absolute bottom-2 right-2 w-8 h-8 rounded-full border border-white/20 flex items-center justify-center text-[6px] text-white font-black opacity-50">ECOWAS</div>
           </div>
           
-          {/* Scanning Line */}
+          {/* Scanning Laser */}
           {stage === 1 && (
-             <div className="absolute inset-0 z-10 bg-gradient-to-b from-transparent via-primary/50 to-transparent w-full h-[10px] animate-[scan_1.5s_ease-in-out_infinite] top-0"></div>
+             <div className="absolute inset-0 z-10 bg-gradient-to-b from-transparent via-green-400/50 to-transparent w-full h-[4px] animate-[scan_1s_ease-in-out_infinite]"></div>
           )}
 
-          {/* Success Overlay */}
-          <div className={`absolute inset-0 bg-white/90 dark:bg-black/80 flex items-center justify-center transition-opacity duration-300 ${stage === 2 ? 'opacity-100' : 'opacity-0'}`}>
-             <div className="flex flex-col items-center">
-                <div className="w-12 h-12 bg-green-500 rounded-full flex items-center justify-center text-white mb-2 animate-bounce">
-                   <span className="material-symbols-outlined">check</span>
-                </div>
-                <span className="font-black text-green-600 dark:text-green-400 text-sm">VERIFIED</span>
-             </div>
+          {/* Coming Soon Badge Overlay */}
+          <div className="absolute top-2 right-2 bg-orange-100 dark:bg-orange-900/30 text-orange-700 dark:text-orange-300 text-[9px] font-black px-2 py-1 rounded-md border border-orange-200 dark:border-orange-500/20">
+             COMING SOON
           </div>
        </div>
     </div>
