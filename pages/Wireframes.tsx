@@ -239,7 +239,7 @@ const RoommateAppSim: React.FC = () => {
                 <span className="material-symbols-outlined text-sm">home</span>
              </div>
              <div>
-                <h3 className="text-sm font-black text-dark dark:text-white leading-none">Legon Flatmates 🏠</h3>
+                <h3 className="text-sm font-black text-dark dark:text-white leading-none">Pent Block B: Room 236 🏠</h3>
                 <p className="text-[10px] text-muted dark:text-gray-400">Shoprite • East Legon</p>
              </div>
           </div>
