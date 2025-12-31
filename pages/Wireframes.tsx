@@ -8,10 +8,9 @@ const LiveTruckMap: React.FC = () => {
   const [stopTimer, setStopTimer] = useState(0);
   const [statusText, setStatusText] = useState("Loading Route...");
 
-  // We define stops at specific percentages of the path
   const STOPS = [
     { percent: 5, name: "Melcom Depot", area: "North Ind. Area" },
-    { percent: 45, name: "A&C Mall", area: "East Legon" }, // Major Stop
+    { percent: 45, name: "A&C Mall", area: "East Legon" }, 
     { percent: 90, name: "Community 1", area: "Tema" }
   ];
 
@@ -19,38 +18,23 @@ const LiveTruckMap: React.FC = () => {
     let animationFrameId: number;
     
     const animate = () => {
-      // 1. Handle Stopping Logic
       if (isStopped) {
-        if (Date.now() > stopTimer) {
-           setIsStopped(false); // Resume driving after wait
-        }
+        if (Date.now() > stopTimer) setIsStopped(false);
       } else {
-        // 2. Move Truck
         setProgress((prev) => {
-          let nextProgress = prev + 0.12; // Speed
-
-          // Loop Route
+          let nextProgress = prev + 0.12;
           if (nextProgress >= 100) nextProgress = 0;
-
-          // Check if we need to stop (only if we haven't stopped recently)
           const stopLocation = STOPS.find(s => Math.abs(s.percent - nextProgress) < 0.5);
           if (stopLocation && stopTimer === 0) {
             setIsStopped(true);
-            setStopTimer(Date.now() + 3000); // Stop for 3 seconds
-            // Snap to exact spot
+            setStopTimer(Date.now() + 3000);
             return stopLocation.percent;
           }
-
-          // Reset stop timer if we are moving away
-          if (!stopLocation) {
-             setStopTimer(0);
-          }
-
+          if (!stopLocation) setStopTimer(0);
           return nextProgress;
         });
       }
 
-      // 3. Update Status Text based on location
       if (progress < 25) setStatusText("Departing: Melcom Warehouse");
       else if (progress < 40) setStatusText("En Route: Madina Zongo Jxn");
       else if (progress < 50) setStatusText("Arriving: East Legon Hub");
@@ -64,14 +48,12 @@ const LiveTruckMap: React.FC = () => {
     return () => cancelAnimationFrame(animationFrameId);
   }, [isStopped, stopTimer, progress]);
 
-  // Cubic Bezier Path: Starts Top-Left (Ind Area), Dips to Madina, Curves to E.Legon, then Tema
   const getBezierPos = (t: number) => {
     const safeT = Math.max(0, Math.min(1, t));
-    const p0 = { x: 10, y: 20 };  // Melcom North Ind.
-    const p1 = { x: 30, y: 90 };  // Madina/Adenta Curve
-    const p2 = { x: 60, y: 90 };  // Spintex Road
-    const p3 = { x: 90, y: 30 };  // Tema
-    
+    const p0 = { x: 10, y: 20 };
+    const p1 = { x: 30, y: 90 };
+    const p2 = { x: 60, y: 90 };
+    const p3 = { x: 90, y: 30 };
     const oneMinusT = 1 - safeT;
     const x = Math.pow(oneMinusT, 3) * p0.x + 3 * Math.pow(oneMinusT, 2) * safeT * p1.x + 3 * oneMinusT * Math.pow(safeT, 2) * p2.x + Math.pow(safeT, 3) * p3.x;
     const y = Math.pow(oneMinusT, 3) * p0.y + 3 * Math.pow(oneMinusT, 2) * safeT * p1.y + 3 * oneMinusT * Math.pow(safeT, 2) * p2.y + Math.pow(safeT, 3) * p3.y;
@@ -80,43 +62,29 @@ const LiveTruckMap: React.FC = () => {
 
   const t = progress / 100;
   const pos = getBezierPos(t);
-  
-  // Rotation
   const lookAheadPos = getBezierPos(Math.min(1, t + 0.01));
   const angle = Math.atan2(lookAheadPos.y - pos.y, lookAheadPos.x - pos.x) * (180 / Math.PI);
 
   return (
     <div className="w-full h-full bg-[#e8eaf6] dark:bg-[#1a1a1a] relative overflow-hidden rounded-[2rem] border-4 border-dark dark:border-gray-700 shadow-2xl transition-colors duration-300">
-      {/* Map Background Pattern */}
       <div className="absolute inset-0 opacity-10 dark:opacity-20" style={{ backgroundImage: 'linear-gradient(#9fa8da 1px, transparent 1px), linear-gradient(90deg, #9fa8da 1px, transparent 1px)', backgroundSize: '40px 40px' }}></div>
-      
-      {/* City Labels (Static) */}
       <div className="absolute top-[20%] left-[10%] text-[10px] font-black text-muted/50 uppercase tracking-widest">North Ind. Area</div>
       <div className="absolute bottom-[10%] left-[30%] text-[10px] font-black text-muted/50 uppercase tracking-widest">Madina</div>
       <div className="absolute bottom-[20%] right-[30%] text-[10px] font-black text-muted/50 uppercase tracking-widest">Spintex</div>
       <div className="absolute top-[30%] right-[10%] text-[10px] font-black text-muted/50 uppercase tracking-widest">Tema Comm. 1</div>
-
-      {/* Road Path */}
       <svg className="absolute inset-0 w-full h-full" viewBox="0 0 100 100" preserveAspectRatio="none">
         <path d="M 10,20 C 30,90 60,90 90,30" fill="none" stroke="#cbd5e1" strokeWidth="12" strokeLinecap="round" className="dark:stroke-gray-700" />
         <path d="M 10,20 C 30,90 60,90 90,30" fill="none" stroke="#fff" strokeWidth="8" strokeLinecap="round" className="dark:stroke-gray-600" />
         <path d="M 10,20 C 30,90 60,90 90,30" fill="none" stroke="#fbbf24" strokeWidth="1" strokeDasharray="4 4" strokeLinecap="round" />
       </svg>
-
-      {/* The Truck */}
-      <div className="absolute z-20 transition-transform duration-75 ease-linear will-change-transform"
-           style={{ left: `${pos.x}%`, top: `${pos.y}%`, transform: `translate(-50%, -50%) rotate(${angle}deg)` }}>
+      <div className="absolute z-20 transition-transform duration-75 ease-linear will-change-transform" style={{ left: `${pos.x}%`, top: `${pos.y}%`, transform: `translate(-50%, -50%) rotate(${angle}deg)` }}>
         <div className="relative">
-          {/* Brake Lights */}
           {isStopped && <div className="absolute left-[-10px] top-1/2 -translate-y-1/2 w-8 h-8 bg-red-500/50 blur-md rounded-full animate-pulse"></div>}
-          
           <div className="w-16 h-9 bg-dark dark:bg-white rounded-lg shadow-2xl border border-white/20 flex items-center justify-between px-1 relative z-10">
             <div className="w-4 h-6 bg-blue-300 dark:bg-blue-900 rounded-sm"></div>
             <span className="text-[7px] font-black text-white dark:text-dark uppercase tracking-tighter">MyKart</span>
             <div className={`w-1 h-6 ${isStopped ? 'bg-red-500 shadow-[0_0_10px_rgba(239,68,68,0.8)]' : 'bg-red-900'} rounded-full transition-colors duration-200`}></div>
           </div>
-          
-          {/* Stop Popup Bubble */}
           {isStopped && (
             <div className="absolute -top-20 left-1/2 -translate-x-1/2 bg-white dark:bg-gray-800 p-3 rounded-xl shadow-xl border-2 border-primary animate-in zoom-in slide-in-from-bottom-2 duration-300 min-w-[160px] z-50">
                <div className="flex flex-col items-center text-center">
@@ -132,8 +100,6 @@ const LiveTruckMap: React.FC = () => {
           )}
         </div>
       </div>
-
-      {/* Floating HUD Panel */}
       <div className="absolute bottom-6 left-6 right-6 bg-white/90 dark:bg-black/80 backdrop-blur-md p-4 rounded-2xl border border-gray-100 dark:border-white/10 shadow-lg flex justify-between items-center">
          <div className="flex flex-col">
             <span className="text-[10px] font-black text-muted dark:text-gray-400 uppercase tracking-widest">Live Status</span>
@@ -148,9 +114,195 @@ const LiveTruckMap: React.FC = () => {
   );
 };
 
-// --- COMPONENT 2: GHANA CARD MOCK DATA SIM ---
+// --- COMPONENT 2: ROOMMATE GROUP ORDER SIMULATION (AUTO-PLAY) ---
+const RoommateAppSim: React.FC = () => {
+  const [stage, setStage] = useState(0); 
+  // Stages: 0=Intro, 1=AddingItems, 2=CartSummary, 3=SplitBill, 4=Paying, 5=Success
+
+  useEffect(() => {
+    // Timeline of the simulation (total loop ~20s)
+    const timers = [
+      setTimeout(() => setStage(1), 2500),  // Go to Adding Items
+      setTimeout(() => setStage(2), 8500),  // Go to Cart Summary (after items added)
+      setTimeout(() => setStage(3), 11500), // Go to Bill Split
+      setTimeout(() => setStage(4), 15000), // Go to Payment Processing
+      setTimeout(() => setStage(5), 18000), // Go to Success
+      setTimeout(() => setStage(0), 22000), // Reset Loop
+    ];
+    return () => timers.forEach(t => clearTimeout(t));
+  }, [stage === 0]); // Only re-run when stage resets to 0
+
+  return (
+    <div className="bg-white dark:bg-[#121212] w-full max-w-[350px] mx-auto h-[600px] rounded-[3rem] border-[8px] border-dark dark:border-gray-700 shadow-2xl relative overflow-hidden flex flex-col font-sans transition-colors duration-300">
+       {/* Phone Status Bar */}
+       <div className="h-8 bg-transparent w-full flex justify-between items-center px-6 pt-3 relative z-20">
+          <span className="text-[10px] font-bold text-dark dark:text-white">9:41</span>
+          <div className="flex gap-1">
+             <div className="w-4 h-4 bg-dark dark:bg-white rounded-full opacity-20"></div>
+             <div className="w-4 h-4 bg-dark dark:bg-white rounded-full opacity-20"></div>
+          </div>
+       </div>
+
+       {/* APP HEADER */}
+       <div className="px-6 pt-4 pb-4 border-b border-gray-100 dark:border-white/5 relative z-10 bg-white dark:bg-[#121212]">
+          <div className="flex items-center gap-2 mb-1">
+             <div className="w-8 h-8 bg-primary rounded-full flex items-center justify-center text-white">
+                <span className="material-symbols-outlined text-sm">home</span>
+             </div>
+             <div>
+                <h3 className="text-sm font-black text-dark dark:text-white leading-none">Legon Flatmates 🏠</h3>
+                <p className="text-[10px] text-muted dark:text-gray-400">Shoprite • East Legon</p>
+             </div>
+          </div>
+          {/* Avatars */}
+          <div className="flex -space-x-2 mt-2">
+             <div className="w-6 h-6 rounded-full bg-blue-500 border-2 border-white dark:border-dark flex items-center justify-center text-[8px] text-white font-bold">AM</div>
+             <div className="w-6 h-6 rounded-full bg-purple-500 border-2 border-white dark:border-dark flex items-center justify-center text-[8px] text-white font-bold">KJ</div>
+             <div className="w-6 h-6 rounded-full bg-green-500 border-2 border-white dark:border-dark flex items-center justify-center text-[8px] text-white font-bold">ME</div>
+             <div className="w-6 h-6 rounded-full bg-gray-100 dark:bg-white/10 border-2 border-white dark:border-dark flex items-center justify-center text-[8px] text-muted font-bold">+</div>
+          </div>
+       </div>
+
+       {/* MAIN CONTENT AREA - SCROLLABLE */}
+       <div className="flex-1 bg-gray-50 dark:bg-white/5 p-4 relative overflow-hidden">
+          
+          {/* STAGE 0 & 1: LIVE FEED */}
+          <div className={`absolute inset-0 p-4 transition-all duration-500 ${stage <= 1 ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-full'}`}>
+             <p className="text-[10px] font-bold text-muted/60 dark:text-gray-500 uppercase tracking-widest mb-4 text-center">Live Activity</p>
+             
+             <div className="space-y-3">
+                {/* Item 1 */}
+                <div className={`flex items-center gap-3 bg-white dark:bg-white/5 p-3 rounded-2xl shadow-sm border border-gray-100 dark:border-white/5 transition-all duration-500 ${stage >= 1 ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'}`}>
+                   <div className="w-10 h-10 bg-orange-50 rounded-xl flex items-center justify-center text-xl">🍚</div>
+                   <div className="flex-1">
+                      <p className="text-xs font-bold text-dark dark:text-white">Rice (5kg)</p>
+                      <p className="text-[10px] text-blue-500 font-bold">Added by Ama</p>
+                   </div>
+                   <span className="text-xs font-black text-dark dark:text-white">GH₵70</span>
+                </div>
+
+                {/* Item 2 - Delayed */}
+                <div className={`flex items-center gap-3 bg-white dark:bg-white/5 p-3 rounded-2xl shadow-sm border border-gray-100 dark:border-white/5 transition-all duration-500 delay-700 ${stage >= 1 ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'}`}>
+                   <div className="w-10 h-10 bg-yellow-50 rounded-xl flex items-center justify-center text-xl">🥚</div>
+                   <div className="flex-1">
+                      <p className="text-xs font-bold text-dark dark:text-white">Eggs (Crate)</p>
+                      <p className="text-[10px] text-purple-500 font-bold">Added by Kojo</p>
+                   </div>
+                   <span className="text-xs font-black text-dark dark:text-white">GH₵60</span>
+                </div>
+
+                {/* Item 3 - Delayed */}
+                <div className={`flex items-center gap-3 bg-white dark:bg-white/5 p-3 rounded-2xl shadow-sm border border-gray-100 dark:border-white/5 transition-all duration-500 delay-[1500ms] ${stage >= 1 ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'}`}>
+                   <div className="w-10 h-10 bg-red-50 rounded-xl flex items-center justify-center text-xl">🍜</div>
+                   <div className="flex-1">
+                      <p className="text-xs font-bold text-dark dark:text-white">Indomie (Box)</p>
+                      <p className="text-[10px] text-green-500 font-bold">Added by You</p>
+                   </div>
+                   <span className="text-xs font-black text-dark dark:text-white">GH₵80</span>
+                </div>
+             </div>
+          </div>
+
+          {/* STAGE 2 & 3 & 4: BILL SPLIT */}
+          <div className={`absolute inset-0 p-4 transition-all duration-500 ${stage >= 2 && stage < 5 ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-full'}`}>
+             <p className="text-[10px] font-bold text-muted/60 dark:text-gray-500 uppercase tracking-widest mb-4 text-center">Smart Split Breakdown</p>
+             
+             <div className="bg-white dark:bg-white/5 rounded-2xl border border-gray-100 dark:border-white/5 p-4 shadow-sm space-y-4">
+                {/* Ama Row */}
+                <div className="flex justify-between items-center">
+                   <div className="flex items-center gap-2">
+                      <div className="w-6 h-6 rounded-full bg-blue-500 text-white flex items-center justify-center text-[8px] font-bold">AM</div>
+                      <span className="text-xs font-bold text-dark dark:text-white">Ama</span>
+                   </div>
+                   <div className="text-right">
+                      <span className="block text-xs font-black text-dark dark:text-white">GH₵ 70.00</span>
+                      {stage >= 4 ? (
+                         <span className="text-[8px] font-bold text-green-500 flex items-center justify-end gap-1"><span className="material-symbols-outlined text-[10px]">check_circle</span> PAID</span>
+                      ) : (
+                         <span className="text-[8px] font-bold text-orange-500">Pending...</span>
+                      )}
+                   </div>
+                </div>
+
+                {/* Kojo Row */}
+                <div className="flex justify-between items-center">
+                   <div className="flex items-center gap-2">
+                      <div className="w-6 h-6 rounded-full bg-purple-500 text-white flex items-center justify-center text-[8px] font-bold">KJ</div>
+                      <span className="text-xs font-bold text-dark dark:text-white">Kojo</span>
+                   </div>
+                   <div className="text-right">
+                      <span className="block text-xs font-black text-dark dark:text-white">GH₵ 60.00</span>
+                      {stage >= 4 ? (
+                         <span className="text-[8px] font-bold text-green-500 flex items-center justify-end gap-1"><span className="material-symbols-outlined text-[10px]">check_circle</span> PAID</span>
+                      ) : (
+                         <span className="text-[8px] font-bold text-orange-500">Pending...</span>
+                      )}
+                   </div>
+                </div>
+
+                {/* You Row */}
+                <div className="flex justify-between items-center bg-green-50 dark:bg-green-900/20 p-2 rounded-lg -mx-2">
+                   <div className="flex items-center gap-2">
+                      <div className="w-6 h-6 rounded-full bg-green-500 text-white flex items-center justify-center text-[8px] font-bold">ME</div>
+                      <span className="text-xs font-bold text-dark dark:text-white">You</span>
+                   </div>
+                   <div className="text-right">
+                      <span className="block text-xs font-black text-dark dark:text-white">GH₵ 80.00</span>
+                      {stage >= 4 ? (
+                         <span className="text-[8px] font-bold text-green-500 flex items-center justify-end gap-1"><span className="material-symbols-outlined text-[10px]">check_circle</span> PAID</span>
+                      ) : (
+                         <button className="text-[8px] font-bold bg-dark text-white px-2 py-1 rounded shadow-sm">PAY NOW</button>
+                      )}
+                   </div>
+                </div>
+                
+                <div className="border-t border-dashed border-gray-200 pt-2 mt-2 flex justify-between">
+                   <span className="text-xs font-bold text-muted dark:text-gray-400">Total Cart</span>
+                   <span className="text-sm font-black text-dark dark:text-white">GH₵ 210.00</span>
+                </div>
+             </div>
+          </div>
+
+          {/* STAGE 5: SUCCESS */}
+          <div className={`absolute inset-0 flex flex-col items-center justify-center p-6 text-center transition-all duration-500 ${stage === 5 ? 'opacity-100 scale-100' : 'opacity-0 scale-90'}`}>
+             <div className="w-20 h-20 bg-green-500 rounded-full flex items-center justify-center text-white mb-4 shadow-xl shadow-green-200 dark:shadow-none animate-bounce">
+                <span className="material-symbols-outlined text-4xl">local_shipping</span>
+             </div>
+             <h3 className="text-xl font-black text-dark dark:text-white mb-2">Order Scheduled!</h3>
+             <p className="text-xs text-muted dark:text-gray-300 mb-6">Everyone has paid. Your roommate run is confirmed.</p>
+             <div className="w-full bg-white dark:bg-white/5 p-3 rounded-xl border border-gray-100 dark:border-white/5">
+                <p className="text-[10px] font-bold text-muted uppercase tracking-widest mb-1">Estimated Delivery</p>
+                <p className="text-sm font-black text-primary">Today, 6:00 PM</p>
+             </div>
+          </div>
+       </div>
+       
+       {/* APP FOOTER (SIMULATED) */}
+       <div className="bg-white dark:bg-[#121212] p-4 border-t border-gray-100 dark:border-white/5 flex justify-between items-center relative z-10">
+          <div className="flex flex-col gap-1 w-full">
+              {/* Progress Bar for Demo */}
+              <div className="h-1 w-full bg-gray-100 dark:bg-white/10 rounded-full overflow-hidden">
+                 <div 
+                   className="h-full bg-primary transition-all duration-[500ms] ease-linear"
+                   style={{ width: `${(stage / 5) * 100}%` }}
+                 ></div>
+              </div>
+              <p className="text-[8px] text-center text-muted dark:text-gray-500 mt-1 uppercase tracking-widest font-bold">
+                 {stage === 0 ? "Loading Group..." : 
+                  stage === 1 ? "Roommates adding items..." : 
+                  stage === 2 ? "Reviewing Cart..." : 
+                  stage === 3 ? "Splitting Bill..." : 
+                  stage === 4 ? "Processing Payments..." : "Order Confirmed"}
+              </p>
+          </div>
+       </div>
+    </div>
+  );
+};
+
+// --- COMPONENT 3: GHANA CARD MOCK DATA SIM ---
 const GhanaCardSim: React.FC = () => {
-  const [stage, setStage] = useState(0); // 0: Idle, 1: Scanning, 2: Extracting
+  const [stage, setStage] = useState(0); 
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -170,8 +322,6 @@ const GhanaCardSim: React.FC = () => {
        </div>
        
        <div className="flex-1 bg-gray-50 dark:bg-black/20 rounded-xl relative flex items-center justify-center overflow-hidden border border-gray-100 dark:border-white/5 p-4">
-          
-          {/* Mock UI: Extracted Data View */}
           <div className={`w-full max-w-[200px] bg-white dark:bg-gray-800 rounded-lg shadow-sm p-3 transition-all duration-500 ${stage === 2 ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4 absolute'}`}>
              <div className="flex items-center gap-2 mb-3 border-b border-gray-100 dark:border-white/10 pb-2">
                 <img src="/logo.png" className="w-4 h-4 opacity-50" alt="" />
@@ -199,66 +349,21 @@ const GhanaCardSim: React.FC = () => {
                  <span className="material-symbols-outlined text-[12px] text-green-500">verified</span>
              </div>
           </div>
-
-          {/* The Physical Card Graphic (Visible in Stage 0 & 1) */}
           <div className={`w-40 h-24 bg-gradient-to-br from-[#2F855A] to-[#ECC94B] rounded-xl shadow-lg relative transition-all duration-500 ${stage === 2 ? 'opacity-0 scale-90 absolute' : 'opacity-100 scale-100'}`}>
              <div className="absolute top-2 left-2 w-8 h-8 bg-gray-200/50 rounded-full"></div>
              <div className="absolute top-4 right-2 w-16 h-2 bg-white/30 rounded-full"></div>
              <div className="absolute bottom-2 left-2 w-24 h-2 bg-white/30 rounded-full"></div>
-             {/* EcoWAS Logo Mock */}
              <div className="absolute bottom-2 right-2 w-8 h-8 rounded-full border border-white/20 flex items-center justify-center text-[6px] text-white font-black opacity-50">ECOWAS</div>
           </div>
-          
-          {/* Scanning Laser */}
           {stage === 1 && (
              <div className="absolute inset-0 z-10 bg-gradient-to-b from-transparent via-green-400/50 to-transparent w-full h-[4px] animate-[scan_1s_ease-in-out_infinite]"></div>
           )}
-
-          {/* Coming Soon Badge Overlay */}
           <div className="absolute top-2 right-2 bg-orange-100 dark:bg-orange-900/30 text-orange-700 dark:text-orange-300 text-[9px] font-black px-2 py-1 rounded-md border border-orange-200 dark:border-orange-500/20">
              COMING SOON
           </div>
        </div>
     </div>
   );
-};
-
-// --- COMPONENT 3: ROOMMATE BILL SPLIT SIMULATION ---
-const RoommateSplitSim: React.FC = () => {
-   return (
-    <div className="bg-white dark:bg-white/5 rounded-3xl p-6 border border-gray-100 dark:border-white/10 shadow-sm h-full flex flex-col">
-       <div className="mb-4">
-          <div className="w-10 h-10 bg-orange-100 dark:bg-orange-900/30 rounded-full flex items-center justify-center text-orange-600 mb-2">
-             <span className="material-symbols-outlined">call_split</span>
-          </div>
-          <h4 className="font-bold text-dark dark:text-white">Smart Bill Split</h4>
-          <p className="text-xs text-muted dark:text-gray-300">Roommate Run Feature</p>
-       </div>
-       
-       <div className="flex-1 flex flex-col justify-center gap-3">
-          {/* Total Bill */}
-          <div className="flex justify-between items-center bg-gray-50 dark:bg-white/5 p-3 rounded-xl">
-             <span className="text-xs font-bold text-muted dark:text-gray-400">Total Cart</span>
-             <span className="text-sm font-black text-dark dark:text-white">GHS 450.00</span>
-          </div>
-          
-          {/* Split Lines */}
-          <div className="relative pl-4 space-y-2 border-l-2 border-dashed border-gray-200 dark:border-gray-700 ml-2">
-             {[1, 2, 3].map((i) => (
-                <div key={i} className="flex items-center justify-between bg-white dark:bg-black/20 p-2 rounded-lg border border-gray-100 dark:border-white/5 shadow-sm">
-                   <div className="flex items-center gap-2">
-                      <div className={`w-6 h-6 rounded-full flex items-center justify-center text-[10px] text-white font-bold ${i===1 ? 'bg-blue-500' : i===2 ? 'bg-purple-500' : 'bg-pink-500'}`}>
-                         {String.fromCharCode(64 + i)}
-                      </div>
-                      <span className="text-xs text-dark dark:text-gray-300">Roomie {i}</span>
-                   </div>
-                   <span className="text-xs font-bold text-green-600 dark:text-green-400">150.00</span>
-                </div>
-             ))}
-          </div>
-       </div>
-    </div>
-   );
 };
 
 const Wireframes: React.FC = () => {
@@ -296,7 +401,6 @@ const Wireframes: React.FC = () => {
       </section>
 
       <section className="py-20 flex flex-col gap-32">
-        {/* Interactive Slider Container */}
         <div className="relative w-full group">
           <button 
             onClick={() => scroll('left')}
@@ -314,7 +418,6 @@ const Wireframes: React.FC = () => {
             <span className="material-symbols-outlined text-2xl md:text-3xl">chevron_right</span>
           </button>
 
-          {/* SCROLL CONTAINER FIX: Added pr-8 to ensure last item has space, and snap-x */}
           <div 
             ref={scrollRef}
             className="flex gap-8 md:gap-12 overflow-x-auto no-scrollbar scroll-smooth px-8 py-12 snap-x snap-mandatory"
@@ -333,7 +436,6 @@ const Wireframes: React.FC = () => {
                 </div>
               </div>
             ))}
-            {/* Spacer div to fix mobile scroll cutting off last item */}
             <div className="w-4 shrink-0"></div>
           </div>
           
@@ -341,7 +443,7 @@ const Wireframes: React.FC = () => {
           <div className="absolute inset-y-0 right-0 w-24 md:w-32 bg-gradient-to-l from-bg-light dark:from-[#23170f] to-transparent z-10 pointer-events-none"></div>
         </div>
 
-        {/* --- ROOMMATE RUN SPOTLIGHT --- */}
+        {/* --- ROOMMATE RUN SPOTLIGHT (REPLACED WITH LIVE DEMO) --- */}
         <section className="mx-auto max-w-6xl px-4">
            <div className="bg-[#FFF8F0] dark:bg-white/5 rounded-[3rem] p-8 md:p-16 overflow-hidden border border-orange-100 dark:border-white/10 relative transition-colors">
              <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center relative z-10">
@@ -382,13 +484,10 @@ const Wireframes: React.FC = () => {
                       </div>
                    </div>
                 </div>
+                {/* --- REPLACED STATIC IMAGE WITH INTERACTIVE DEMO --- */}
                 <div className="order-1 lg:order-2 flex justify-center">
-                   <div className="relative w-[280px] rotate-3 hover:rotate-0 transition-all duration-500">
-                      <img 
-                        src="https://raw.githubusercontent.com/princessasabea/princess-website/a73b75287274cf45ce2f7e2de7ef9914b9ed6f28/public/legonroomate.png" 
-                        alt="MyKart Roommate Run Feature Screen" 
-                        className="w-full rounded-[2.5rem] shadow-2xl border-8 border-white dark:border-gray-800"
-                      />
+                   <div className="relative w-full max-w-[350px]">
+                      <RoommateAppSim />
                    </div>
                 </div>
              </div>
@@ -396,21 +495,29 @@ const Wireframes: React.FC = () => {
            </div>
         </section>
 
-        {/* --- NEW SECTION: INTERACTIVE FEATURE SIMULATIONS --- */}
+        {/* --- INTERACTIVE FEATURE SIMULATIONS --- */}
         <div className="max-w-6xl mx-auto px-4 w-full">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
-               {/* Ghana Card Feature Demo */}
                <GhanaCardSim />
-               
-               {/* Roommate Bill Split Demo */}
-               <RoommateSplitSim />
+               {/* Note: Removed duplicate RoommateSplitSim since it's now the main hero demo above */}
+               <div className="bg-gradient-to-br from-primary to-orange-600 rounded-3xl p-8 flex flex-col justify-between text-white shadow-lg relative overflow-hidden h-full">
+                  <div className="relative z-10">
+                    <h3 className="text-2xl font-black mb-2">Join the Pilot</h3>
+                    <p className="text-white/80 text-sm mb-6">Be the first to test Roommate Run on your campus.</p>
+                    <a href="https://tally.so/r/WO2v4v" target="_blank" rel="noreferrer" className="inline-flex px-6 py-3 bg-white text-primary font-bold rounded-xl shadow-lg hover:scale-105 transition-transform">
+                       Join Waitlist
+                    </a>
+                  </div>
+                  <div className="absolute bottom-[-20px] right-[-20px] opacity-20">
+                     <span className="material-symbols-outlined text-[150px]">rocket_launch</span>
+                  </div>
+               </div>
             </div>
         </div>
 
         {/* Unified Kommunity Truck & Logistics Space */}
         <div className="max-w-6xl mx-auto px-4 w-full flex flex-col gap-12">
           <div id="kommunity-truck" className="bg-white dark:bg-white/5 rounded-[4rem] border border-gray-100 dark:border-white/10 shadow-2xl overflow-hidden transition-colors">
-            {/* Live Tracking Header & Map */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center p-10 md:p-20 relative overflow-hidden">
                <div className="absolute -top-40 -left-40 w-96 h-96 bg-primary/5 dark:bg-primary/10 rounded-full blur-[100px] pointer-events-none"></div>
                <div className="space-y-10 relative z-10">
@@ -441,8 +548,6 @@ const Wireframes: React.FC = () => {
                   <LiveTruckMap />
                </div>
             </div>
-
-            {/* Weekly Routes */}
             <div id="planned-routes" className="bg-bg-light/50 dark:bg-black/20 border-t border-gray-100 dark:border-white/10 py-16">
               <TruckSchedule showHero={false} />
             </div>
