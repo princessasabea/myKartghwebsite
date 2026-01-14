@@ -97,7 +97,7 @@ const Team: React.FC = () => {
       category: 'ops',
     },
     {
-      name: 'Antown',
+      name: 'Antoungmine Omar',
       role: 'Marketing & Growth',
       description: 'Leads early growth strategy and customer acquisition.',
       category: 'ops',
