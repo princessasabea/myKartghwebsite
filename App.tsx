@@ -74,7 +74,7 @@ const Navbar: React.FC<{ onToggle: (open: boolean) => void }> = ({ onToggle }) =
     <nav className="sticky top-0 z-[100] w-full bg-bg-light dark:bg-dark border-b border-gray-100 dark:border-white/10 shadow-sm transition-colors duration-300">
       <div className="max-w-6xl mx-auto px-4 py-3 flex justify-between items-center relative z-[110]">
         <Link to="/" className="flex items-center gap-2 group">
-          <img src="/logo.png" alt="MyKart Logo" className="h-10 w-auto object-contain" />
+          <img src="/logo2.jpeg" alt="MyKart Logo" className="h-10 w-auto object-contain" />
           {/* ADDED: dark:text-white */}
           <span className="text-xl font-extrabold tracking-tight text-dark dark:text-white dark:text-white transition-colors">MyKart</span>
         </Link>
@@ -142,7 +142,7 @@ const Footer: React.FC = () => (
     <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-12">
       <div className="col-span-1 md:col-span-2">
         <div className="flex items-center gap-2 mb-4">
-          <img src="/logo.png" alt="MyKart Logo" className="h-8 w-auto object-contain" />
+          <img src="/logo2.jpeg" alt="MyKart Logo" className="h-8 w-auto object-contain" />
           {/* ADDED: dark:text-white */}
           <span className="text-xl font-black text-dark dark:text-white dark:text-white">MyKart</span>
         </div>
