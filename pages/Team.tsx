@@ -1,23 +1,19 @@
 import React, { useState, useEffect, useRef } from 'react';
 
-// --- COMPONENT: THE GROWTH CYCLE ANIMATION (OPTIMIZED) ---
+// --- COMPONENT: THE GROWTH CYCLE ANIMATION (INDIVIDUAL SPROUTING) ---
 const GrowthAnimation = ({ team }) => {
   const [isPaused, setIsPaused] = useState(false);
   const [progress, setProgress] = useState(0); // 0 to 100
   const requestRef = useRef();
 
-  // Animation Phases:
-  // 0-25: Tree Grows
-  // 25-45: Fruits (Initials) Appear
-  // 45-75: Falling to Ground
-  // 75-95: Blooming into Cards
-  // 95-100: Pause before reset
+  // Animation Speed Configuration
+  const SPEED = 0.2; 
 
   const animate = () => {
     if (!isPaused) {
       setProgress(prev => {
         if (prev >= 100) return 0; // Auto-loop
-        return prev + 0.25; // Smooth speed
+        return prev + SPEED;
       });
     }
     requestRef.current = requestAnimationFrame(animate);
@@ -33,7 +29,7 @@ const GrowthAnimation = ({ team }) => {
     setIsPaused(false);
   };
 
-  // Fixed positions on the tree branches (approximate percentages)
+  // Fixed positions on the tree (X, Y percentages)
   const treePositions = [
     { x: 30, y: 30 }, { x: 70, y: 35 }, { x: 50, y: 15 }, 
     { x: 20, y: 50 }, { x: 80, y: 55 }, { x: 10, y: 40 },
@@ -43,7 +39,7 @@ const GrowthAnimation = ({ team }) => {
   ];
 
   return (
-    <div className="w-full h-[800px] relative overflow-hidden bg-gradient-to-b from-sky-100 to-sky-50 dark:from-[#0f172a] dark:to-[#1e293b] border-t border-gray-200 dark:border-white/5 font-sans group select-none">
+    <div className="w-full h-[850px] relative overflow-hidden bg-gradient-to-b from-sky-100 to-sky-50 dark:from-[#0f172a] dark:to-[#1e293b] border-t border-gray-200 dark:border-white/5 font-sans group select-none">
       
       {/* --- CONTROLS --- */}
       <div className="absolute top-6 left-6 z-50 flex gap-2">
@@ -63,10 +59,9 @@ const GrowthAnimation = ({ team }) => {
       </div>
 
       {/* --- BACKGROUND --- */}
-      {/* Sun */}
       <div className="absolute top-10 right-10 w-32 h-32 bg-yellow-300 rounded-full blur-[60px] opacity-60 animate-pulse"></div>
       
-      {/* Ground */}
+      {/* Ground Layers */}
       <div className="absolute bottom-0 w-[150%] -left-[25%] h-[200px] bg-[#4ade80] dark:bg-[#064e3b] rounded-[100%] translate-y-1/2 blur-sm"></div>
       <div className="absolute bottom-0 w-full h-[100px] bg-gradient-to-t from-[#22c55e] to-[#86efac] dark:from-[#065f46] dark:to-[#10b981]"></div>
 
@@ -80,20 +75,17 @@ const GrowthAnimation = ({ team }) => {
              className="transition-transform duration-100 origin-bottom"
              style={{ transform: `scaleY(${Math.min(1, progress / 20)})` }}
            />
-           {/* Big Branches */}
+           {/* Branches */}
            <g className="transition-opacity duration-500" style={{ opacity: progress > 15 ? 1 : 0 }}>
-              {/* Left Branches */}
               <path d="M250,300 Q150,200 50,250" stroke="#5D4037" strokeWidth="12" fill="none" strokeLinecap="round" />
               <path d="M250,280 Q180,180 80,150" stroke="#5D4037" strokeWidth="10" fill="none" strokeLinecap="round" />
-              {/* Right Branches */}
               <path d="M250,300 Q350,200 450,250" stroke="#5D4037" strokeWidth="12" fill="none" strokeLinecap="round" />
               <path d="M250,280 Q320,180 420,150" stroke="#5D4037" strokeWidth="10" fill="none" strokeLinecap="round" />
-              {/* Center Branches */}
               <path d="M250,250 V100" stroke="#5D4037" strokeWidth="12" fill="none" strokeLinecap="round" />
               <path d="M250,200 Q200,100 150,80" stroke="#5D4037" strokeWidth="8" fill="none" strokeLinecap="round" />
               <path d="M250,200 Q300,100 350,80" stroke="#5D4037" strokeWidth="8" fill="none" strokeLinecap="round" />
            </g>
-           {/* Foliage (Leaves) - Bubbles */}
+           {/* Leaves */}
            <g className="transition-transform duration-1000 origin-center" style={{ transform: progress > 20 ? 'scale(1)' : 'scale(0)', opacity: progress > 20 ? 0.9 : 0 }}>
               <circle cx="250" cy="150" r="100" fill="#22c55e" />
               <circle cx="150" cy="200" r="80" fill="#22c55e" />
@@ -105,82 +97,103 @@ const GrowthAnimation = ({ team }) => {
         </svg>
       </div>
 
-      {/* --- THE TEAM MEMBERS --- */}
+      {/* --- THE TEAM MEMBERS (INDIVIDUAL LIFECYCLES) --- */}
       <div className="absolute inset-0 pointer-events-none">
          {team.map((member, idx) => {
             const treePos = treePositions[idx % treePositions.length];
             
-            // Calculate Spread on Ground (From 5% to 95% of screen width)
-            const spreadStep = 90 / (team.length - 1);
-            const groundX = 5 + (idx * spreadStep); 
-
-            // Logic Stages
-            const isGrowing = progress > 25 && progress < 45;
-            const isFalling = progress >= 45 && progress < 75;
-            const isGrounded = progress >= 75;
-
-            // Styles based on state
-            let top = `${treePos.y}%`; // Default on tree
-            let left = `${treePos.x}%`; // Default on tree (centered relative to container)
-            let scale = 0;
-            let opacity = 0;
+            // --- TIMING LOGIC ---
+            // We stagger the "Start Drop" time for each person
+            // Global 'progress' goes 0 -> 100
             
-            // Adjust Left position relative to container size for tree vs ground
-            // Tree is centered (approx 50% screen), Cards are spread (0-100% screen)
-            const treeLeftAbsolute = 50 + ((treePos.x - 50) * 0.4); // Constrain tree fruits to center area
+            // When does THIS person appear on the tree? (25% + slight random offset)
+            const appearTime = 25 + (idx * 2);
+            
+            // When does THIS person start falling? (45% + heavy stagger)
+            // We spread the drop times out significantly so they don't fall in a clump
+            const dropStartTime = 45 + (idx * 3.5); 
+            
+            // Fall duration (how long it takes to hit ground)
+            const dropDuration = 5; 
+            
+            // When does the sprout start? (Immediately after landing)
+            const landTime = dropStartTime + dropDuration;
 
-            if (isGrowing) {
-               scale = Math.min(1, (progress - 25) / 10);
-               opacity = 1;
-               left = `${treeLeftAbsolute}%`;
-            } else if (isFalling) {
-               scale = 1;
-               opacity = 1;
-               // Lerp Fall Logic
-               const fallP = Math.min(1, (progress - 45 - (idx * 0.5)) / 20); // Staggered
-               
+            // --- CALCULATE STATE ---
+            let state = 'hidden'; // hidden, tree, falling, grounded
+            let localProgress = 0; // 0-1 for current phase
+
+            if (progress < appearTime) {
+               state = 'hidden';
+            } else if (progress < dropStartTime) {
+               state = 'tree';
+               localProgress = Math.min(1, (progress - appearTime) / 10); // Grow scale on tree
+            } else if (progress < landTime) {
+               state = 'falling';
+               localProgress = (progress - dropStartTime) / dropDuration; // 0 (top) to 1 (ground)
+            } else {
+               state = 'grounded';
+               localProgress = Math.min(1, (progress - landTime) / 10); // Bloom progress
+            }
+
+            // --- POSITION LOGIC ---
+            const groundX = 8 + (idx * (84 / (team.length - 1))); // Spread 8% to 92%
+            const treeLeftAbsolute = 50 + ((treePos.x - 50) * 0.4); // Centered tree coordinates
+
+            let top = `${treePos.y}%`;
+            let left = `${treeLeftAbsolute}%`;
+            let scale = state === 'tree' ? localProgress : 1;
+            let opacity = state === 'hidden' ? 0 : 1;
+            
+            // Stem Height Calculation (Grows from 0px to 40px)
+            const stemHeight = state === 'grounded' ? localProgress * 40 : 0;
+
+            if (state === 'falling') {
                // Lerp Y: Tree Y -> 85% (Ground)
-               const currentY = treePos.y + (fallP * (85 - treePos.y));
+               const currentY = treePos.y + (localProgress * (85 - treePos.y));
                top = `${currentY}%`;
-
-               // Lerp X: Tree X -> Ground Spread X
-               const currentX = treeLeftAbsolute + (fallP * (groundX - treeLeftAbsolute));
+               
+               // Lerp X: Tree X -> Ground X
+               const currentX = treeLeftAbsolute + (localProgress * (groundX - treeLeftAbsolute));
                left = `${currentX}%`;
-            } else if (isGrounded) {
-               scale = 1;
-               opacity = 1;
-               top = '85%'; // Fixed Ground Level
+            } else if (state === 'grounded') {
+               top = '85%'; 
                left = `${groundX}%`;
             }
 
             return (
                <div 
                  key={idx}
-                 className="absolute transition-all duration-100 ease-linear flex flex-col items-center pointer-events-auto"
+                 className="absolute transition-transform duration-75 ease-linear flex flex-col items-center pointer-events-auto"
                  style={{ 
                     top, 
                     left, 
                     transform: `translate(-50%, -50%) scale(${scale})`, 
-                    opacity 
+                    opacity,
+                    zIndex: state === 'grounded' ? 20 + idx : 10
                  }}
                >
-                  {/* PHASE 1: FRUIT (On Tree / Falling) */}
-                  {!isGrounded && (
-                     <div className="w-10 h-10 rounded-full bg-white dark:bg-white/10 shadow-lg border-2 border-primary flex items-center justify-center relative z-20">
+                  {/* VISUAL: THE FRUIT (Hidden once sprouted) */}
+                  {state !== 'grounded' && (
+                     <div className="w-10 h-10 rounded-full bg-white dark:bg-white/10 shadow-lg border-2 border-primary flex items-center justify-center relative animate-pulse">
                         <span className="text-xs font-black text-primary">
                            {member.name.split(' ').map(n => n[0]).join('')}
                         </span>
                      </div>
                   )}
 
-                  {/* PHASE 2: BLOOM (Card on Ground) */}
-                  {isGrounded && (
-                     <div className="animate-in zoom-in slide-in-from-bottom-4 duration-700 origin-bottom">
-                        {/* Stem */}
-                        <div className="w-1 h-8 bg-green-600 mx-auto -mb-1"></div>
+                  {/* VISUAL: THE SPROUTING FLOWER (Only when grounded) */}
+                  {state === 'grounded' && (
+                     <div className="flex flex-col items-center justify-end relative -top-8">
                         
-                        {/* Rectangular Card */}
-                        <div className="bg-white dark:bg-[#232323] p-2 rounded-md shadow-xl border-b-4 border-primary w-24 md:w-32 hover:scale-110 hover:z-50 transition-transform cursor-pointer relative -top-24">
+                        {/* The Card (Blooms Scale 0 -> 1) */}
+                        <div 
+                           className="bg-white dark:bg-[#232323] p-2 rounded-md shadow-xl border-b-4 border-primary w-24 hover:scale-125 hover:z-50 transition-transform cursor-pointer origin-bottom"
+                           style={{ 
+                              transform: `scale(${localProgress})`,
+                              opacity: localProgress 
+                           }}
+                        >
                            <div className="w-8 h-8 bg-gray-100 dark:bg-white/10 rounded-md mx-auto mb-2 overflow-hidden">
                               {member.image ? (
                                 <img src={member.image} className="w-full h-full object-cover" alt="" />
@@ -193,6 +206,12 @@ const GrowthAnimation = ({ team }) => {
                            <p className="text-[9px] font-black text-dark dark:text-white text-center leading-tight truncate">{member.name}</p>
                            <p className="text-[7px] font-bold text-primary text-center uppercase tracking-wider truncate mt-1">{member.role}</p>
                         </div>
+
+                        {/* The Stem (Grows Height) */}
+                        <div 
+                           className="w-1 bg-green-600 rounded-full"
+                           style={{ height: `${stemHeight}px` }}
+                        ></div>
                      </div>
                   )}
                </div>
@@ -200,7 +219,7 @@ const GrowthAnimation = ({ team }) => {
          })}
       </div>
 
-      {/* Progress Bar (Visual Timer) */}
+      {/* Progress Bar */}
       <div className="absolute bottom-0 left-0 h-1 bg-primary z-50 transition-all duration-100 ease-linear" style={{ width: `${progress}%` }}></div>
 
     </div>
@@ -387,7 +406,7 @@ const Team = () => {
              })}
           </div>
 
-          {/* LEVEL 3: LEAVES - RECTANGULAR CONTAINER */}
+          {/* LEVEL 3: LEAVES */}
           <div className="w-full bg-gray-50/50 dark:bg-white/5 rounded-lg border border-gray-200 dark:border-white/10 p-8 md:p-12 mt-4 min-h-[400px] transition-all relative">
              <div className="absolute top-0 left-1/2 -translate-x-1/2 -mt-2 w-4 h-2 bg-primary rounded-b-full"></div>
 
