@@ -78,6 +78,7 @@ const Navbar: React.FC<{ onToggle: (open: boolean) => void }> = ({ onToggle }) =
             src="/logo2.jpeg" 
             alt="MyKart Logo" 
             className="h-12 w-auto object-contain"
+          />
         </Link>
         
 
