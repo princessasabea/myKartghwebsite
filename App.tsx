@@ -182,7 +182,7 @@ const Footer: React.FC = () => (
       </div>
     </div>
     <div className="max-w-6xl mx-auto mt-12 pt-8 border-t border-gray-100 dark:border-white/10 text-center">
-      <p className="text-xs text-muted dark:text-gray-300/60 dark:text-gray-500">© 2025 MyKart Ghana. Reimagining retail for the Ghanaian context. Launching Soon.</p>
+      <p className="text-xs text-muted dark:text-gray-300/60 dark:text-gray-500">© 2025 MyKart Ghana. Launching Soon.</p>
     </div>
   </footer>
 );
