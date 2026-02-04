@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 
-// --- COMPONENT: UNITY ORBIT ANIMATION ---
+// --- COMPONENT: UNITY ORBIT ANIMATION (RESPONSIVE) ---
 const UnityOrbitAnimation = ({ team }) => {
   const [isPaused, setIsPaused] = useState(false);
 
@@ -9,27 +9,27 @@ const UnityOrbitAnimation = ({ team }) => {
   const CENTER = 250; // Center of the 500x500 SVG
 
   return (
-    <div className="w-full h-[600px] relative overflow-hidden bg-gradient-to-b from-sky-50 to-white dark:from-[#0f172a] dark:to-[#121212] border-t border-gray-200 dark:border-white/5 font-sans group select-none flex flex-col items-center justify-center">
+    <div className="w-full h-[400px] md:h-[600px] relative overflow-hidden bg-gradient-to-b from-sky-50 to-white dark:from-[#0f172a] dark:to-[#121212] border-t border-gray-200 dark:border-white/5 font-sans group select-none flex flex-col items-center justify-center">
       
       {/* --- CONTROLS --- */}
-      <div className="absolute top-6 left-6 z-50">
+      <div className="absolute top-4 left-4 z-50">
         <button 
           onClick={() => setIsPaused(!isPaused)}
-          className="bg-white/80 dark:bg-black/50 backdrop-blur-md px-4 py-2 rounded-md shadow-lg border border-gray-200 dark:border-white/10 text-dark dark:text-white font-bold text-xs uppercase tracking-widest hover:scale-105 transition-transform flex items-center gap-2"
+          className="bg-white/80 dark:bg-black/50 backdrop-blur-md px-3 py-1.5 md:px-4 md:py-2 rounded-md shadow-lg border border-gray-200 dark:border-white/10 text-dark dark:text-white font-bold text-[10px] md:text-xs uppercase tracking-widest hover:scale-105 transition-transform flex items-center gap-2"
         >
           <span className="material-symbols-outlined text-sm">{isPaused ? 'play_arrow' : 'pause'}</span>
-          {isPaused ? 'Resume Orbit' : 'Pause Orbit'}
+          {isPaused ? 'Resume' : 'Pause'}
         </button>
       </div>
 
       {/* --- BACKGROUND DECORATION --- */}
       <div className="absolute inset-0 opacity-30 pointer-events-none">
-         <div className="absolute top-1/4 left-1/4 w-64 h-64 bg-primary/20 rounded-full blur-[100px]"></div>
-         <div className="absolute bottom-1/4 right-1/4 w-64 h-64 bg-blue-400/20 rounded-full blur-[100px]"></div>
+         <div className="absolute top-1/4 left-1/4 w-32 md:w-64 h-32 md:h-64 bg-primary/20 rounded-full blur-[60px] md:blur-[100px]"></div>
+         <div className="absolute bottom-1/4 right-1/4 w-32 md:w-64 h-32 md:h-64 bg-blue-400/20 rounded-full blur-[60px] md:blur-[100px]"></div>
       </div>
 
-      {/* --- THE ANIMATION CONTAINER --- */}
-      <div className="relative w-[500px] h-[500px] max-w-full">
+      {/* --- THE ANIMATION CONTAINER (SCALED FOR MOBILE) --- */}
+      <div className="relative w-[500px] h-[500px] max-w-full transform scale-[0.65] sm:scale-[0.8] md:scale-100 transition-transform origin-center">
         
         {/* CSS for Rotation */}
         <style>{`
@@ -64,7 +64,7 @@ const UnityOrbitAnimation = ({ team }) => {
            <div className="w-24 h-24 bg-white dark:bg-[#1e1e1e] rounded-full shadow-[0_0_40px_rgba(250,121,33,0.3)] flex items-center justify-center border-4 border-primary/20 z-20 relative">
               <span className="material-symbols-outlined text-5xl text-primary animate-pulse">shopping_cart</span>
            </div>
-           {/* Connecting lines from center to ring (Visual aesthetic) */}
+           {/* Connecting lines from center to ring */}
            <svg className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[400px] h-[400px] pointer-events-none z-0 opacity-20 animate-spin-slow">
               <circle cx="200" cy="200" r="80" stroke="currentColor" strokeWidth="1" fill="none" className="text-primary" strokeDasharray="4 4" />
            </svg>
@@ -81,7 +81,7 @@ const UnityOrbitAnimation = ({ team }) => {
 
            {team.map((member, idx) => {
               const total = team.length;
-              const angle = (idx / total) * 360; // Spread evenly
+              const angle = (idx / total) * 360; 
               const radian = (angle * Math.PI) / 180;
               
               // Calculate Position on Circle
@@ -100,7 +100,7 @@ const UnityOrbitAnimation = ({ team }) => {
                     top: `${y}px`,
                   }}
                 >
-                   {/* Counter-Rotate Container to keep text upright while orbiting */}
+                   {/* Counter-Rotate Container */}
                    <div 
                      className={`w-full h-full flex flex-col items-center justify-center ${isPaused ? 'paused' : 'animate-counter-rotate'}`}
                    >
@@ -133,8 +133,8 @@ const UnityOrbitAnimation = ({ team }) => {
 
       </div>
       
-      <div className="absolute bottom-10 text-center opacity-60">
-         <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-muted dark:text-gray-400">United around the Mission</p>
+      <div className="absolute bottom-6 md:bottom-10 text-center opacity-60">
+         <p className="text-[8px] md:text-[10px] font-bold uppercase tracking-[0.3em] text-muted dark:text-gray-400">United around the Mission</p>
       </div>
 
     </div>
@@ -289,7 +289,7 @@ const Team = () => {
       </section>
 
       {/* TREE DIAGRAM SECTION */}
-      <section className="px-4 overflow-x-auto relative z-10">
+      <section className="px-4 overflow-x-auto relative z-10 no-scrollbar">
         <div className="min-w-[800px] max-w-6xl mx-auto flex flex-col items-center">
           
           {/* LEVEL 1: FOUNDER (ROOT) */}
@@ -322,7 +322,7 @@ const Team = () => {
              })}
           </div>
 
-          {/* LEVEL 3: LEAVES */}
+          {/* LEVEL 3: LEAVES - RECTANGULAR CONTAINER */}
           <div className="w-full bg-gray-50/50 dark:bg-white/5 rounded-lg border border-gray-200 dark:border-white/10 p-8 md:p-12 mt-4 min-h-[400px] transition-all relative">
              <div className="absolute top-0 left-1/2 -translate-x-1/2 -mt-2 w-4 h-2 bg-primary rounded-b-full"></div>
 
@@ -336,9 +336,14 @@ const Team = () => {
              </div>
           </div>
         </div>
+        
+        {/* Mobile Swipe Hint */}
+        <div className="md:hidden text-center text-xs text-muted dark:text-gray-500 mt-4 animate-pulse">
+           ← Swipe to explore structure →
+        </div>
       </section>
 
-      {/* --- UNITY ORBIT ANIMATION (New Section) --- */}
+      {/* --- UNITY ORBIT ANIMATION --- */}
       <section className="w-full mt-0">
          <UnityOrbitAnimation team={team} />
       </section>
