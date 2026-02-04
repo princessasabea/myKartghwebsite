@@ -6,7 +6,7 @@ const Terms: React.FC = () => {
     <div className="flex flex-col w-full bg-white dark:bg-white/5 py-24 px-4">
       <div className="max-w-3xl mx-auto">
         <h1 className="text-4xl md:text-7xl font-black mb-4">Terms of Service</h1>
-        <p className="text-muted dark:text-gray-300 mb-12">Last updated: January 1, 2025</p>
+        <p className="text-muted dark:text-gray-300 mb-12">Last updated: January 1, 2026</p>
         
         <div className="prose prose-lg text-muted dark:text-gray-300 space-y-8">
            <section>
