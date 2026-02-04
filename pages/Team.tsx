@@ -15,10 +15,11 @@ const Team = () => {
     },
     // --- PRODUCT TEAM (Sika & Peter) ---
     {
-      name: 'Sika',
+      name: 'Sika Boateng',
       role: 'Project Manager',
       description: 'Keeps the team aligned and moving forward. Manages timelines, resources, and ensures we hit our milestones effectively.',
       category: 'product',
+      linkedin: 'https://www.linkedin.com/in/sika-boateng-62a099357/'
     },
     {
       name: 'Peter Kersi',
@@ -149,7 +150,7 @@ const Team = () => {
       {/* Header */}
       <section className="pt-24 pb-10 px-4 text-center">
         <span className="text-primary font-bold text-xs uppercase tracking-widest block mb-4">The Structure</span>
-        <h1 className="text-4xl md:text-6xl font-black text-dark dark:text-white tracking-tighter">Our Team Tree</h1>
+        <h1 className="text-4xl md:text-6xl font-black text-dark dark:text-white tracking-tighter">The myKart Team</h1>
       </section>
 
       {/* TREE DIAGRAM SECTION */}
