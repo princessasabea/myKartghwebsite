@@ -1,222 +1,147 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState } from 'react';
 
-// --- COMPONENT: THE GROWTH CYCLE ANIMATION (STOPS AT END) ---
-const GrowthAnimation = ({ team }) => {
+// --- COMPONENT: UNITY ORBIT ANIMATION ---
+const UnityOrbitAnimation = ({ team }) => {
   const [isPaused, setIsPaused] = useState(false);
-  const [progress, setProgress] = useState(0); // 0 to 100
-  const [isFinished, setIsFinished] = useState(false);
-  const requestRef = useRef();
 
-  // Animation Speed
-  const SPEED = 0.25; 
-
-  const animate = () => {
-    if (!isPaused && !isFinished) {
-      setProgress(prev => {
-        const next = prev + SPEED;
-        if (next >= 100) {
-           setIsFinished(true);
-           setIsPaused(true); // Stop the loop
-           return 100;
-        }
-        return next;
-      });
-      requestRef.current = requestAnimationFrame(animate);
-    }
-  };
-
-  useEffect(() => {
-    if (!isFinished && !isPaused) {
-       requestRef.current = requestAnimationFrame(animate);
-    }
-    return () => cancelAnimationFrame(requestRef.current);
-  }, [isPaused, isFinished]);
-
-  const handleRestart = () => {
-    setIsFinished(false);
-    setProgress(0);
-    setIsPaused(false);
-  };
-
-  const handlePlayPause = () => {
-    if (isFinished) {
-       handleRestart();
-    } else {
-       setIsPaused(!isPaused);
-    }
-  };
-
-  // Fixed positions on the tree (X, Y percentages)
-  const treePositions = [
-    { x: 30, y: 30 }, { x: 70, y: 35 }, { x: 50, y: 15 }, 
-    { x: 20, y: 50 }, { x: 80, y: 55 }, { x: 10, y: 40 },
-    { x: 90, y: 40 }, { x: 40, y: 25 }, { x: 60, y: 25 },
-    { x: 25, y: 60 }, { x: 75, y: 60 }, { x: 50, y: 40 },
-    { x: 35, y: 50 }, { x: 65, y: 50 }
-  ];
+  // Radius of the circle
+  const RADIUS = 160; 
+  const CENTER = 250; // Center of the 500x500 SVG
 
   return (
-    <div className="w-full h-[850px] relative overflow-hidden bg-gradient-to-b from-sky-100 to-sky-50 dark:from-[#0f172a] dark:to-[#1e293b] border-t border-gray-200 dark:border-white/5 font-sans group select-none">
+    <div className="w-full h-[600px] relative overflow-hidden bg-gradient-to-b from-sky-50 to-white dark:from-[#0f172a] dark:to-[#121212] border-t border-gray-200 dark:border-white/5 font-sans group select-none flex flex-col items-center justify-center">
       
       {/* --- CONTROLS --- */}
-      <div className="absolute top-6 left-6 z-50 flex gap-2">
+      <div className="absolute top-6 left-6 z-50">
         <button 
-          onClick={handlePlayPause}
+          onClick={() => setIsPaused(!isPaused)}
           className="bg-white/80 dark:bg-black/50 backdrop-blur-md px-4 py-2 rounded-md shadow-lg border border-gray-200 dark:border-white/10 text-dark dark:text-white font-bold text-xs uppercase tracking-widest hover:scale-105 transition-transform flex items-center gap-2"
         >
-          <span className="material-symbols-outlined text-sm">
-             {isFinished ? 'replay' : isPaused ? 'play_arrow' : 'pause'}
-          </span>
-          {isFinished ? 'Replay' : isPaused ? 'Resume' : 'Pause'}
+          <span className="material-symbols-outlined text-sm">{isPaused ? 'play_arrow' : 'pause'}</span>
+          {isPaused ? 'Resume Orbit' : 'Pause Orbit'}
         </button>
       </div>
 
-      {/* --- BACKGROUND --- */}
-      <div className="absolute top-10 right-10 w-32 h-32 bg-yellow-300 rounded-full blur-[60px] opacity-60 animate-pulse"></div>
+      {/* --- BACKGROUND DECORATION --- */}
+      <div className="absolute inset-0 opacity-30 pointer-events-none">
+         <div className="absolute top-1/4 left-1/4 w-64 h-64 bg-primary/20 rounded-full blur-[100px]"></div>
+         <div className="absolute bottom-1/4 right-1/4 w-64 h-64 bg-blue-400/20 rounded-full blur-[100px]"></div>
+      </div>
+
+      {/* --- THE ANIMATION CONTAINER --- */}
+      <div className="relative w-[500px] h-[500px] max-w-full">
+        
+        {/* CSS for Rotation */}
+        <style>{`
+          @keyframes orbit {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+          }
+          @keyframes counter-rotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(-360deg); }
+          }
+          @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-5px); }
+          }
+          .animate-orbit {
+            animation: orbit 60s linear infinite;
+          }
+          .animate-counter-rotate {
+            animation: counter-rotate 60s linear infinite;
+          }
+          .animate-float {
+            animation: float 3s ease-in-out infinite;
+          }
+          .paused {
+            animation-play-state: paused !important;
+          }
+        `}</style>
+
+        {/* 1. CENTER TROLLEY (Stationary) */}
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-20 flex flex-col items-center justify-center">
+           <div className="w-24 h-24 bg-white dark:bg-[#1e1e1e] rounded-full shadow-[0_0_40px_rgba(250,121,33,0.3)] flex items-center justify-center border-4 border-primary/20 z-20 relative">
+              <span className="material-symbols-outlined text-5xl text-primary animate-pulse">shopping_cart</span>
+           </div>
+           {/* Connecting lines from center to ring (Visual aesthetic) */}
+           <svg className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[400px] h-[400px] pointer-events-none z-0 opacity-20 animate-spin-slow">
+              <circle cx="200" cy="200" r="80" stroke="currentColor" strokeWidth="1" fill="none" className="text-primary" strokeDasharray="4 4" />
+           </svg>
+        </div>
+
+        {/* 2. THE RING OF PEOPLE (Rotates) */}
+        <div 
+          className={`absolute inset-0 w-full h-full ${isPaused ? 'paused' : 'animate-orbit'}`}
+        >
+           <svg className="w-full h-full absolute inset-0 overflow-visible" viewBox="0 0 500 500">
+              {/* The "Holding Hands" Line */}
+              <circle cx={CENTER} cy={CENTER} r={RADIUS} stroke="#cbd5e1" strokeWidth="2" fill="none" className="dark:stroke-white/10" />
+           </svg>
+
+           {team.map((member, idx) => {
+              const total = team.length;
+              const angle = (idx / total) * 360; // Spread evenly
+              const radian = (angle * Math.PI) / 180;
+              
+              // Calculate Position on Circle
+              const x = CENTER + RADIUS * Math.cos(radian);
+              const y = CENTER + RADIUS * Math.sin(radian);
+
+              // Stagger floating animation
+              const delay = idx * 0.2;
+
+              return (
+                <div
+                  key={idx}
+                  className="absolute w-12 h-12 -ml-6 -mt-6 z-30"
+                  style={{
+                    left: `${x}px`,
+                    top: `${y}px`,
+                  }}
+                >
+                   {/* Counter-Rotate Container to keep text upright while orbiting */}
+                   <div 
+                     className={`w-full h-full flex flex-col items-center justify-center ${isPaused ? 'paused' : 'animate-counter-rotate'}`}
+                   >
+                      {/* Floating Wrapper */}
+                      <div 
+                        className={`relative group cursor-pointer ${isPaused ? 'paused' : 'animate-float'}`}
+                        style={{ animationDelay: `${delay}s` }}
+                      >
+                         {/* Avatar Circle */}
+                         <div className="w-12 h-12 rounded-full bg-white dark:bg-[#232323] border-2 border-primary shadow-lg flex items-center justify-center overflow-hidden hover:scale-125 transition-transform duration-300">
+                            {member.image ? (
+                               <img src={member.image} className="w-full h-full object-cover" alt="" />
+                            ) : (
+                               <span className="text-xs font-black text-dark dark:text-white">
+                                  {member.name.split(' ').map(n => n[0]).join('')}
+                               </span>
+                            )}
+                         </div>
+                         
+                         {/* Name Tooltip (Visible on Hover) */}
+                         <div className="absolute -bottom-8 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity bg-dark dark:bg-white text-white dark:text-dark text-[8px] font-bold px-2 py-1 rounded whitespace-nowrap pointer-events-none shadow-xl">
+                            {member.name}
+                         </div>
+                      </div>
+                   </div>
+                </div>
+              );
+           })}
+        </div>
+
+      </div>
       
-      {/* Ground Layers */}
-      <div className="absolute bottom-0 w-[150%] -left-[25%] h-[200px] bg-[#4ade80] dark:bg-[#064e3b] rounded-[100%] translate-y-1/2 blur-sm"></div>
-      <div className="absolute bottom-0 w-full h-[100px] bg-gradient-to-t from-[#22c55e] to-[#86efac] dark:from-[#065f46] dark:to-[#10b981]"></div>
-
-      {/* --- THE GIANT TREE --- */}
-      <div className="absolute bottom-[80px] left-1/2 -translate-x-1/2 w-[800px] h-[700px] flex items-end justify-center pointer-events-none origin-bottom">
-        <svg className="w-full h-full" viewBox="0 0 500 500" preserveAspectRatio="xMidYMax meet">
-           {/* Trunk Growth */}
-           <path 
-             d="M230,500 Q250,400 250,300 Q250,400 270,500 Z" 
-             fill="#5D4037" 
-             className="transition-transform duration-100 origin-bottom"
-             style={{ transform: `scaleY(${Math.min(1, progress / 20)})` }}
-           />
-           {/* Branches */}
-           <g className="transition-opacity duration-500" style={{ opacity: progress > 15 ? 1 : 0 }}>
-              <path d="M250,300 Q150,200 50,250" stroke="#5D4037" strokeWidth="12" fill="none" strokeLinecap="round" />
-              <path d="M250,280 Q180,180 80,150" stroke="#5D4037" strokeWidth="10" fill="none" strokeLinecap="round" />
-              <path d="M250,300 Q350,200 450,250" stroke="#5D4037" strokeWidth="12" fill="none" strokeLinecap="round" />
-              <path d="M250,280 Q320,180 420,150" stroke="#5D4037" strokeWidth="10" fill="none" strokeLinecap="round" />
-              <path d="M250,250 V100" stroke="#5D4037" strokeWidth="12" fill="none" strokeLinecap="round" />
-              <path d="M250,200 Q200,100 150,80" stroke="#5D4037" strokeWidth="8" fill="none" strokeLinecap="round" />
-              <path d="M250,200 Q300,100 350,80" stroke="#5D4037" strokeWidth="8" fill="none" strokeLinecap="round" />
-           </g>
-           {/* Leaves */}
-           <g className="transition-transform duration-1000 origin-center" style={{ transform: progress > 20 ? 'scale(1)' : 'scale(0)', opacity: progress > 20 ? 0.9 : 0 }}>
-              <circle cx="250" cy="150" r="100" fill="#22c55e" />
-              <circle cx="150" cy="200" r="80" fill="#22c55e" />
-              <circle cx="350" cy="200" r="80" fill="#22c55e" />
-              <circle cx="250" cy="80" r="70" fill="#22c55e" />
-              <circle cx="100" cy="250" r="60" fill="#22c55e" />
-              <circle cx="400" cy="250" r="60" fill="#22c55e" />
-           </g>
-        </svg>
+      <div className="absolute bottom-10 text-center opacity-60">
+         <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-muted dark:text-gray-400">United around the Mission</p>
       </div>
-
-      {/* --- THE TEAM MEMBERS (INDIVIDUAL LIFECYCLES) --- */}
-      <div className="absolute inset-0 pointer-events-none">
-         {team.map((member, idx) => {
-            const treePos = treePositions[idx % treePositions.length];
-            
-            // TIMING LOGIC
-            const appearTime = 25 + (idx * 2);
-            const dropStartTime = 45 + (idx * 3.5); 
-            const dropDuration = 5; 
-            const landTime = dropStartTime + dropDuration;
-
-            // CALCULATE STATE
-            let state = 'hidden'; 
-            let localProgress = 0; 
-
-            if (progress < appearTime) {
-               state = 'hidden';
-            } else if (progress < dropStartTime) {
-               state = 'tree';
-               localProgress = Math.min(1, (progress - appearTime) / 10);
-            } else if (progress < landTime) {
-               state = 'falling';
-               localProgress = (progress - dropStartTime) / dropDuration; 
-            } else {
-               state = 'grounded';
-               localProgress = Math.min(1, (progress - landTime) / 10); 
-            }
-
-            // POSITION LOGIC
-            const groundX = 8 + (idx * (84 / (team.length - 1))); 
-            const treeLeftAbsolute = 50 + ((treePos.x - 50) * 0.4); 
-
-            let top = `${treePos.y}%`;
-            let left = `${treeLeftAbsolute}%`;
-            let scale = state === 'tree' ? localProgress : 1;
-            let opacity = state === 'hidden' ? 0 : 1;
-            
-            const stemHeight = state === 'grounded' ? localProgress * 40 : 0;
-
-            if (state === 'falling') {
-               const currentY = treePos.y + (localProgress * (85 - treePos.y));
-               top = `${currentY}%`;
-               const currentX = treeLeftAbsolute + (localProgress * (groundX - treeLeftAbsolute));
-               left = `${currentX}%`;
-            } else if (state === 'grounded') {
-               top = '85%'; 
-               left = `${groundX}%`;
-            }
-
-            return (
-               <div 
-                 key={idx}
-                 className="absolute transition-transform duration-75 ease-linear flex flex-col items-center pointer-events-auto"
-                 style={{ 
-                    top, 
-                    left, 
-                    transform: `translate(-50%, -50%) scale(${scale})`, 
-                    opacity,
-                    zIndex: state === 'grounded' ? 20 + idx : 10
-                 }}
-               >
-                  {/* FRUIT */}
-                  {state !== 'grounded' && (
-                     <div className="w-10 h-10 rounded-full bg-white dark:bg-white/10 shadow-lg border-2 border-primary flex items-center justify-center relative animate-pulse">
-                        <span className="text-xs font-black text-primary">
-                           {member.name.split(' ').map(n => n[0]).join('')}
-                        </span>
-                     </div>
-                  )}
-
-                  {/* FLOWER/CARD */}
-                  {state === 'grounded' && (
-                     <div className="flex flex-col items-center justify-end relative -top-8">
-                        <div 
-                           className="bg-white dark:bg-[#232323] p-2 rounded-md shadow-xl border-b-4 border-primary w-24 hover:scale-125 hover:z-50 transition-transform cursor-pointer origin-bottom"
-                           style={{ 
-                              transform: `scale(${localProgress})`,
-                              opacity: localProgress 
-                           }}
-                        >
-                           <div className="w-8 h-8 bg-gray-100 dark:bg-white/10 rounded-md mx-auto mb-2 overflow-hidden">
-                              {member.image ? (
-                                <img src={member.image} className="w-full h-full object-cover" alt="" />
-                              ) : (
-                                <span className="flex items-center justify-center h-full text-[10px] font-black text-muted dark:text-gray-400">
-                                   {member.name.charAt(0)}
-                                </span>
-                              )}
-                           </div>
-                           <p className="text-[9px] font-black text-dark dark:text-white text-center leading-tight truncate">{member.name}</p>
-                           <p className="text-[7px] font-bold text-primary text-center uppercase tracking-wider truncate mt-1">{member.role}</p>
-                        </div>
-                        <div className="w-1 bg-green-600 rounded-full" style={{ height: `${stemHeight}px` }}></div>
-                     </div>
-                  )}
-               </div>
-            );
-         })}
-      </div>
-
-      {/* Progress Bar */}
-      <div className="absolute bottom-0 left-0 h-1 bg-primary z-50 transition-all duration-100 ease-linear" style={{ width: `${progress}%` }}></div>
 
     </div>
   );
 };
 
+// --- MAIN TEAM COMPONENT ---
 const Team = () => {
   const [selectedMember, setSelectedMember] = useState(null);
   const [activeCategory, setActiveCategory] = useState('product');
@@ -356,24 +281,33 @@ const Team = () => {
 
   return (
     <div className="flex flex-col w-full bg-bg-light dark:bg-dark min-h-screen transition-colors duration-300">
+      
+      {/* Header */}
       <section className="pt-24 pb-10 px-4 text-center">
         <span className="text-primary font-bold text-xs uppercase tracking-widest block mb-4">The Structure</span>
         <h1 className="text-4xl md:text-6xl font-black text-dark dark:text-white tracking-tighter">The myKart Team</h1>
       </section>
 
+      {/* TREE DIAGRAM SECTION */}
       <section className="px-4 overflow-x-auto relative z-10">
         <div className="min-w-[800px] max-w-6xl mx-auto flex flex-col items-center">
+          
+          {/* LEVEL 1: FOUNDER (ROOT) */}
           <div className="relative mb-12">
              {leadMember && renderMemberCard(leadMember, 0, true)}
              <div className="absolute left-1/2 -translate-x-1/2 top-full h-12 w-0.5 bg-gray-300 dark:bg-gray-700"></div>
           </div>
+
+          {/* LEVEL 2: BRANCHES */}
           <div className="w-full flex justify-center items-start gap-4 relative">
              <div className="absolute top-0 left-[10%] right-[10%] h-0.5 bg-gray-300 dark:bg-gray-700"></div>
+
              {categories.map((cat, idx) => {
                const isActive = activeCategory === cat.id;
                return (
                  <div key={cat.id} className="flex flex-col items-center flex-1 relative">
                     <div className="h-8 w-0.5 bg-gray-300 dark:bg-gray-700"></div>
+                    
                     <button 
                       onClick={() => setActiveCategory(cat.id)}
                       className={`relative z-10 px-6 py-3 rounded-md border-2 transition-all duration-300 flex items-center gap-2 shadow-lg hover:scale-105 active:scale-95 ${isActive ? 'bg-primary border-primary text-white scale-110 shadow-primary/30' : 'bg-white dark:bg-[#1e1e1e] border-gray-200 dark:border-white/10 text-muted dark:text-gray-400 hover:border-primary/50'}`}
@@ -381,13 +315,17 @@ const Team = () => {
                        <span className="material-symbols-outlined text-[18px]">{cat.icon}</span>
                        <span className="font-bold text-sm whitespace-nowrap">{cat.label}</span>
                     </button>
+
                     <div className={`h-12 w-0.5 transition-all duration-300 ${isActive ? 'bg-primary h-12' : 'bg-transparent h-0'}`}></div>
                  </div>
                );
              })}
           </div>
+
+          {/* LEVEL 3: LEAVES */}
           <div className="w-full bg-gray-50/50 dark:bg-white/5 rounded-lg border border-gray-200 dark:border-white/10 p-8 md:p-12 mt-4 min-h-[400px] transition-all relative">
              <div className="absolute top-0 left-1/2 -translate-x-1/2 -mt-2 w-4 h-2 bg-primary rounded-b-full"></div>
+
              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
                {team.filter(m => m.category === activeCategory).map((m, idx) => renderMemberCard(m, idx))}
                {team.filter(m => m.category === activeCategory).length === 0 && (
@@ -400,10 +338,12 @@ const Team = () => {
         </div>
       </section>
 
+      {/* --- UNITY ORBIT ANIMATION (New Section) --- */}
       <section className="w-full mt-0">
-         <GrowthAnimation team={team} />
+         <UnityOrbitAnimation team={team} />
       </section>
 
+      {/* Bio Modal */}
       {selectedMember && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-dark/80 backdrop-blur-md animate-in fade-in duration-300" onClick={() => setSelectedMember(null)}>
           <div className="bg-white dark:bg-gray-900 rounded-lg w-full max-w-lg shadow-2xl animate-in zoom-in-95 duration-200 p-8 md:p-12 text-center relative overflow-hidden border border-gray-100 dark:border-white/10" onClick={(e) => e.stopPropagation()}>
@@ -427,6 +367,7 @@ const Team = () => {
         </div>
       )}
 
+      {/* Join CTA */}
       <section className="py-32 px-4 bg-white dark:bg-white/5 border-t border-gray-100 dark:border-white/10 relative overflow-hidden text-center">
          <div className="max-w-4xl mx-auto relative z-10">
             <h2 className="text-4xl md:text-7xl font-black text-dark dark:text-white tracking-tighter mb-8">Grow with us.</h2>
