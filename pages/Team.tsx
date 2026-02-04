@@ -69,7 +69,7 @@ const Team = () => {
     },
     // --- DESIGN TEAM ---
     {
-      name: 'Damilola Tomisin Ayodeji ',
+      name: 'Damilola Tomisin Ayodeji',
       role: 'UI/UX Designer',
       description: 'Designs intuitive user flows and validates product experience through research.',
       category: 'design',
@@ -154,7 +154,7 @@ const Team = () => {
       </section>
 
       {/* TREE DIAGRAM SECTION */}
-      <section className="pb-32 px-4 overflow-x-auto">
+      <section className="pb-20 px-4 overflow-x-auto relative z-10">
         <div className="min-w-[800px] max-w-6xl mx-auto flex flex-col items-center">
           
           {/* LEVEL 1: FOUNDER (ROOT) */}
@@ -213,7 +213,73 @@ const Team = () => {
         </div>
       </section>
 
-      {/* Bio Modal (Unchanged logic, just keeping it consistent) */}
+      {/* --- NEW: THE UNITY ROOTS ANIMATION --- */}
+      <section className="py-24 px-4 bg-gradient-to-b from-transparent to-primary/5 dark:to-primary/10 relative overflow-hidden">
+         {/* Inline Styles for the custom gather animation */}
+         <style>{`
+           @keyframes gather {
+             0% { transform: translate(var(--tw-translate-x), var(--tw-translate-y)) scale(0.5); opacity: 0; }
+             50% { opacity: 1; }
+             100% { transform: translate(0, 0) scale(1); opacity: 0.8; }
+           }
+           .animate-gather {
+             animation: gather 8s ease-in-out infinite alternate;
+           }
+         `}</style>
+
+         <div className="max-w-4xl mx-auto relative h-[500px] flex items-end justify-center">
+            
+            {/* The Tree SVG (Background) */}
+            <svg className="absolute bottom-0 w-full h-full max-w-lg opacity-20 dark:opacity-10 text-dark dark:text-white" viewBox="0 0 200 200" preserveAspectRatio="xMidYMax slice">
+               {/* Trunk */}
+               <path d="M90,200 Q100,150 100,100 Q100,150 110,200 Z" fill="currentColor" />
+               {/* Branches */}
+               <path d="M100,100 Q80,70 60,80 M100,100 Q120,70 140,80 M100,120 Q70,110 50,130 M100,120 Q130,110 150,130" stroke="currentColor" strokeWidth="2" fill="none" />
+               {/* Canopy Circles (Abstract) */}
+               <circle cx="100" cy="60" r="40" fill="currentColor" className="text-primary opacity-20" />
+               <circle cx="70" cy="90" r="30" fill="currentColor" className="text-primary opacity-20" />
+               <circle cx="130" cy="90" r="30" fill="currentColor" className="text-primary opacity-20" />
+            </svg>
+
+            {/* The Text */}
+            <div className="absolute top-10 text-center z-10">
+               <h3 className="text-2xl font-black text-dark dark:text-white mb-2">Rooted in Unity</h3>
+               <p className="text-sm text-muted dark:text-gray-400">Individual seeds, growing together.</p>
+            </div>
+
+            {/* The "Seeds" (Team Members) */}
+            <div className="absolute inset-0 w-full h-full">
+               {team.map((member, idx) => {
+                  // Calculate random starting positions for the animation
+                  const startX = (Math.random() * 200) - 100; // -100% to +100%
+                  const startY = (Math.random() * 100) + 20;  // 20% to 120% down
+                  const delay = Math.random() * 5; // Random delay for organic feel
+                  
+                  return (
+                    <div 
+                      key={idx}
+                      className="absolute bottom-20 left-1/2 w-10 h-10 md:w-14 md:h-14 bg-white dark:bg-white/10 rounded-full shadow-lg border border-primary/20 flex items-center justify-center animate-gather hover:z-50 hover:scale-125 transition-transform cursor-default"
+                      style={{ 
+                        '--tw-translate-x': `${startX}%`, 
+                        '--tw-translate-y': `${startY}%`,
+                        animationDelay: `${delay}s` 
+                      }}
+                      title={`${member.name} - ${member.role}`}
+                    >
+                       <span className="text-[10px] md:text-xs font-black text-primary">
+                          {member.name.split(' ').map(n => n[0]).join('')}
+                       </span>
+                    </div>
+                  );
+               })}
+               
+               {/* The Core/Energy Center at the bottom */}
+               <div className="absolute bottom-20 left-1/2 -translate-x-1/2 w-24 h-24 bg-primary rounded-full blur-[50px] opacity-30 animate-pulse"></div>
+            </div>
+         </div>
+      </section>
+
+      {/* Bio Modal */}
       {selectedMember && (
         <div 
           className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-dark/80 backdrop-blur-md animate-in fade-in duration-300"
@@ -224,20 +290,31 @@ const Team = () => {
             onClick={(e) => e.stopPropagation()}
           >
             <div className="absolute top-0 right-0 p-6">
-               <button onClick={() => setSelectedMember(null)} className="w-10 h-10 rounded-full bg-gray-50 dark:bg-white/10 flex items-center justify-center text-muted dark:text-white hover:bg-gray-100 transition-colors">
+               <button 
+                 onClick={() => setSelectedMember(null)}
+                 className="w-10 h-10 rounded-full bg-gray-50 dark:bg-white/10 flex items-center justify-center text-muted dark:text-white hover:bg-gray-100 transition-colors"
+               >
                  <span className="material-symbols-outlined">close</span>
                </button>
             </div>
+            
             <div className="w-24 h-24 bg-bg-light dark:bg-white/5 rounded-[2rem] flex items-center justify-center font-black text-primary overflow-hidden border border-gray-50 dark:border-white/5 shadow-inner mx-auto mb-6">
               {selectedMember.image ? (
                 <img src={selectedMember.image} className="w-full h-full object-cover" alt={selectedMember.name} />
               ) : (
-                <span className="text-3xl">{selectedMember.name.split(' ').map(n => n[0]).join('')}</span>
+                <span className="text-3xl">
+                  {selectedMember.name.split(' ').map(n => n[0]).join('')}
+                </span>
               )}
             </div>
+            
             <h3 className="text-3xl font-black text-dark dark:text-white mb-1">{selectedMember.name}</h3>
             <p className="text-primary font-extrabold uppercase tracking-widest text-xs mb-6">{selectedMember.role}</p>
-            <p className="text-muted dark:text-gray-300 text-lg leading-relaxed mb-8">{selectedMember.description}</p>
+            
+            <p className="text-muted dark:text-gray-300 text-lg leading-relaxed mb-8">
+              {selectedMember.description}
+            </p>
+            
             <div className="flex justify-center gap-4 mb-8">
               {selectedMember.linkedin && (
                 <a href={selectedMember.linkedin} target="_blank" rel="noopener noreferrer" className="w-12 h-12 rounded-full bg-gray-50 dark:bg-white/10 flex items-center justify-center text-muted dark:text-white hover:bg-primary hover:text-white transition-all">
@@ -250,19 +327,40 @@ const Team = () => {
                 </a>
               )}
             </div>
-            <button onClick={() => setSelectedMember(null)} className="w-full py-4 bg-dark dark:bg-white text-white dark:text-dark font-bold rounded-2xl hover:bg-black transition-colors">Close Bio</button>
+            
+            <button 
+              onClick={() => setSelectedMember(null)}
+              className="w-full py-4 bg-dark dark:bg-white text-white dark:text-dark font-bold rounded-2xl hover:bg-black transition-colors"
+            >
+              Close Bio
+            </button>
           </div>
         </div>
       )}
 
-      {/* Join CTA */}
-      <section className="py-32 px-4 bg-white dark:bg-white/5 border-t border-gray-100 dark:border-white/10 relative overflow-hidden text-center">
-         <div className="max-w-4xl mx-auto relative z-10">
-            <h2 className="text-4xl md:text-7xl font-black text-dark dark:text-white tracking-tighter mb-8">Grow with us.</h2>
-            <a href="https://tally.so/r/WO2v4v" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-3 px-10 py-5 bg-primary text-white font-black text-lg rounded-2xl shadow-2xl hover:scale-105 transition-all">
-              Apply to Join <span className="material-symbols-outlined">north_east</span>
-            </a>
-         </div>
+      {/* Join the Team Section */}
+      <section className="py-32 px-4 bg-white dark:bg-white/5 border-t border-gray-100 dark:border-white/10 relative overflow-hidden">
+        <div className="max-w-4xl mx-auto text-center relative z-10">
+           <div className="inline-flex items-center gap-2 px-4 py-1 bg-primary/10 rounded-full mb-8">
+              <span className="material-symbols-outlined text-primary text-[18px]">rocket_launch</span>
+              <span className="text-xs font-black text-primary uppercase tracking-widest">We are Looking for Volunteers</span>
+           </div>
+           <h2 className="text-4xl md:text-7xl font-black text-dark dark:text-white tracking-tighter leading-[0.95] mb-8">Join the Mission.</h2>
+           <p className="text-xl text-muted dark:text-gray-300 font-medium max-w-2xl mx-auto leading-relaxed mb-12">
+             We are looking for passionate builders, designers, and operators to help us reshape retail in Ghana. If you want to build for the future, we want to meet you.
+           </p>
+           <a 
+             href="https://tally.so/r/WO2v4v" 
+             target="_blank" 
+             rel="noopener noreferrer"
+             className="inline-flex items-center gap-3 px-10 py-5 bg-primary text-white font-black text-lg rounded-2xl shadow-2xl shadow-primary/30 hover:bg-orange-600 hover:scale-105 active:scale-95 transition-all group"
+           >
+             Apply to Join Us
+             <span className="material-symbols-outlined group-hover:translate-x-1 transition-transform">north_east</span>
+           </a>
+        </div>
+        <div className="absolute -bottom-20 -right-20 w-80 h-80 bg-accent/20 rounded-full blur-[100px]"></div>
+        <div className="absolute -top-20 -left-20 w-80 h-80 bg-primary/5 rounded-full blur-[100px]"></div>
       </section>
     </div>
   );
