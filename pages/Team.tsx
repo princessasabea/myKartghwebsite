@@ -4,12 +4,12 @@ import React, { useState } from 'react';
 const UnityOrbitAnimation = ({ team }) => {
   const [isPaused, setIsPaused] = useState(false);
 
-  // Radius of the circle
+  // We use CSS transforms to handle the scaling rather than fixed pixel math for responsiveness
   const RADIUS = 160; 
-  const CENTER = 250; // Center of the 500x500 SVG
+  const CENTER = 250; 
 
   return (
-    <div className="w-full h-[380px] md:h-[600px] relative overflow-hidden bg-gradient-to-b from-sky-50 to-white dark:from-[#0f172a] dark:to-[#121212] border-t border-gray-200 dark:border-white/5 font-sans group select-none flex flex-col items-center justify-center transition-colors duration-300">
+    <div className="w-full h-[450px] md:h-[700px] relative overflow-hidden bg-gradient-to-b from-sky-50 to-white dark:from-[#0f172a] dark:to-[#121212] border-t border-gray-200 dark:border-white/5 font-sans group select-none flex flex-col items-center justify-center transition-colors duration-300">
       
       {/* --- CONTROLS --- */}
       <div className="absolute top-4 left-4 z-50">
@@ -28,9 +28,13 @@ const UnityOrbitAnimation = ({ team }) => {
          <div className="absolute bottom-1/4 right-1/4 w-32 md:w-64 h-32 md:h-64 bg-blue-400/20 rounded-full blur-[60px] md:blur-[100px]"></div>
       </div>
 
-      {/* --- THE ANIMATION CONTAINER (SCALED FOR MOBILE) --- */}
-      {/* scale-[0.55] forces the 500px container to fit on 320px screens */}
-      <div className="relative w-[500px] h-[500px] max-w-full transform scale-[0.55] sm:scale-[0.7] md:scale-100 transition-transform origin-center">
+      {/* --- THE ANIMATION CONTAINER --- */}
+      {/* RESPONSIVE STRATEGY:
+          - scale-[0.60]: Fits on small mobile (320px+)
+          - sm:scale-[0.8]: Fits on tablets
+          - md:scale-100: Full size on desktop
+      */}
+      <div className="relative w-[500px] h-[500px] shrink-0 transform scale-[0.60] sm:scale-[0.8] md:scale-100 transition-transform origin-center">
         
         {/* CSS for Rotation */}
         <style>{`
@@ -65,7 +69,7 @@ const UnityOrbitAnimation = ({ team }) => {
            <div className="w-24 h-24 bg-white dark:bg-[#1e1e1e] rounded-full shadow-[0_0_40px_rgba(250,121,33,0.3)] flex items-center justify-center border-4 border-primary/20 z-20 relative">
               <span className="material-symbols-outlined text-5xl text-primary animate-pulse">shopping_cart</span>
            </div>
-           {/* Connecting lines from center to ring */}
+           {/* Visual Connecting Ring */}
            <svg className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[400px] h-[400px] pointer-events-none z-0 opacity-20 animate-spin-slow">
               <circle cx="200" cy="200" r="80" stroke="currentColor" strokeWidth="1" fill="none" className="text-primary" strokeDasharray="4 4" />
            </svg>
@@ -110,7 +114,7 @@ const UnityOrbitAnimation = ({ team }) => {
                             )}
                          </div>
                          {/* Name Tooltip */}
-                         <div className="absolute -bottom-8 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity bg-dark dark:bg-white text-white dark:text-dark text-[8px] font-bold px-2 py-1 rounded whitespace-nowrap pointer-events-none shadow-xl">
+                         <div className="absolute -bottom-8 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity bg-dark dark:bg-white text-white dark:text-dark text-[8px] font-bold px-2 py-1 rounded whitespace-nowrap pointer-events-none shadow-xl z-50">
                             {member.name}
                          </div>
                       </div>
@@ -238,28 +242,32 @@ const Team = () => {
 
   const leadMember = team.find(m => m.category === 'lead');
 
+  // Updated Card with responsiveness
   const renderMemberCard = (member, idx, isLarge = false) => (
     <div 
       key={idx} 
       onClick={() => setSelectedMember(member)}
-      className={`group cursor-pointer bg-white dark:bg-white/5 border border-gray-100 dark:border-white/10 hover:border-primary/50 dark:hover:border-primary/50 hover:shadow-xl transition-all flex flex-col gap-3 relative overflow-hidden ${isLarge ? 'p-8 rounded-lg w-full max-w-sm mx-auto z-20 shadow-2xl ring-4 ring-white dark:ring-dark' : 'p-5 rounded-md animate-in zoom-in-95 duration-300'}`}
+      className={`group cursor-pointer bg-white dark:bg-white/5 border border-gray-100 dark:border-white/10 hover:border-primary/50 dark:hover:border-primary/50 hover:shadow-xl transition-all flex flex-col gap-3 relative overflow-hidden 
+      ${isLarge 
+         ? 'p-6 md:p-8 rounded-lg w-full max-w-sm mx-auto z-20 shadow-2xl ring-4 ring-white dark:ring-dark' 
+         : 'p-4 md:p-5 rounded-md animate-in zoom-in-95 duration-300'}`}
     >
       <div className={`flex flex-col items-center text-center`}>
-        <div className={`${isLarge ? 'w-32 h-32 mb-4' : 'w-16 h-16 mb-3'} bg-bg-light dark:bg-white/10 rounded-md flex items-center justify-center font-black text-primary overflow-hidden border-2 border-gray-100 dark:border-white/5 shadow-inner`}>
+        <div className={`${isLarge ? 'w-24 h-24 md:w-32 md:h-32 mb-3 md:mb-4' : 'w-14 h-14 md:w-16 md:h-16 mb-2 md:mb-3'} bg-bg-light dark:bg-white/10 rounded-md flex items-center justify-center font-black text-primary overflow-hidden border-2 border-gray-100 dark:border-white/5 shadow-inner`}>
           {member.image ? (
             <img src={member.image} className="w-full h-full object-cover" alt={member.name} />
           ) : (
-            <span className={isLarge ? 'text-4xl' : 'text-xl'}>
+            <span className={isLarge ? 'text-3xl md:text-4xl' : 'text-lg md:text-xl'}>
               {member.name.split(' ').map(n => n[0]).join('')}
             </span>
           )}
         </div>
-        <h4 className={`${isLarge ? 'text-2xl' : 'text-lg'} font-black text-dark dark:text-white group-hover:text-primary transition-colors`}>{member.name}</h4>
-        <p className={`${isLarge ? 'text-sm' : 'text-[10px]'} text-primary font-bold uppercase tracking-widest`}>{member.role}</p>
+        <h4 className={`${isLarge ? 'text-xl md:text-2xl' : 'text-base md:text-lg'} font-black text-dark dark:text-white group-hover:text-primary transition-colors leading-tight`}>{member.name}</h4>
+        <p className={`${isLarge ? 'text-xs md:text-sm' : 'text-[10px]'} text-primary font-bold uppercase tracking-widest mt-1`}>{member.role}</p>
         
         {!isLarge && (
            <span className="mt-2 text-[10px] text-muted dark:text-gray-400 opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-1">
-             View Profile <span className="material-symbols-outlined text-[10px]">arrow_forward</span>
+             View <span className="material-symbols-outlined text-[10px]">arrow_forward</span>
            </span>
         )}
       </div>
@@ -270,50 +278,64 @@ const Team = () => {
     <div className="flex flex-col w-full bg-bg-light dark:bg-dark min-h-screen transition-colors duration-300">
       
       {/* Header */}
-      <section className="pt-24 pb-10 px-4 text-center">
+      <section className="pt-24 pb-8 md:pb-10 px-4 text-center">
         <span className="text-primary font-bold text-xs uppercase tracking-widest block mb-4">The Structure</span>
         <h1 className="text-4xl md:text-6xl font-black text-dark dark:text-white tracking-tighter">The myKart Team</h1>
       </section>
 
-      {/* TREE DIAGRAM SECTION */}
-      <section className="px-4 overflow-x-auto relative z-10 no-scrollbar">
-        <div className="min-w-[800px] max-w-6xl mx-auto flex flex-col items-center">
+      {/* TREE DIAGRAM SECTION - RESPONSIVE LAYOUT */}
+      <section className="px-4 relative z-10 w-full">
+        {/* We removed min-w-[800px] and overflow-auto. Instead we use a flex layout that adapts. */}
+        <div className="w-full max-w-6xl mx-auto flex flex-col items-center">
           
           {/* LEVEL 1: FOUNDER (ROOT) */}
-          <div className="relative mb-12">
+          <div className="relative mb-8 md:mb-12 w-full flex justify-center">
              {leadMember && renderMemberCard(leadMember, 0, true)}
-             <div className="absolute left-1/2 -translate-x-1/2 top-full h-12 w-0.5 bg-gray-300 dark:bg-gray-700"></div>
+             {/* Vertical line connecting root to next level */}
+             <div className="absolute left-1/2 -translate-x-1/2 top-full h-8 md:h-12 w-0.5 bg-gray-300 dark:bg-gray-700"></div>
           </div>
 
-          {/* LEVEL 2: BRANCHES */}
-          <div className="w-full flex justify-center items-start gap-4 relative">
-             <div className="absolute top-0 left-[10%] right-[10%] h-0.5 bg-gray-300 dark:bg-gray-700"></div>
+          {/* LEVEL 2: BRANCHES (Categories) */}
+          {/* Mobile: Wrap (Stack), Desktop: No Wrap (Line) */}
+          <div className="w-full flex flex-wrap md:flex-nowrap justify-center items-start gap-4 md:gap-4 relative">
+             
+             {/* Desktop Horizontal Line (Hidden on Mobile) */}
+             <div className="hidden md:block absolute top-0 left-[10%] right-[10%] h-0.5 bg-gray-300 dark:bg-gray-700"></div>
 
              {categories.map((cat, idx) => {
                const isActive = activeCategory === cat.id;
                return (
-                 <div key={cat.id} className="flex flex-col items-center flex-1 relative">
-                    <div className="h-8 w-0.5 bg-gray-300 dark:bg-gray-700"></div>
+                 <div key={cat.id} className="flex flex-col items-center flex-1 min-w-[140px] md:min-w-0 relative mb-4 md:mb-0">
                     
+                    {/* Vertical Stem (Different height for mobile vs desktop) */}
+                    <div className="h-0 md:h-8 w-0.5 bg-gray-300 dark:bg-gray-700 hidden md:block"></div>
+                    
+                    {/* BUTTONS */}
                     <button 
                       onClick={() => setActiveCategory(cat.id)}
-                      className={`relative z-10 px-6 py-3 rounded-md border-2 transition-all duration-300 flex items-center gap-2 shadow-lg hover:scale-105 active:scale-95 ${isActive ? 'bg-primary border-primary text-white scale-110 shadow-primary/30' : 'bg-white dark:bg-[#1e1e1e] border-gray-200 dark:border-white/10 text-muted dark:text-gray-400 hover:border-primary/50'}`}
+                      className={`relative z-10 px-4 py-2 md:px-6 md:py-3 rounded-md border-2 transition-all duration-300 flex items-center gap-2 shadow-lg w-full md:w-auto justify-center
+                      ${isActive 
+                        ? 'bg-primary border-primary text-white scale-105 md:scale-110 shadow-primary/30' 
+                        : 'bg-white dark:bg-[#1e1e1e] border-gray-200 dark:border-white/10 text-muted dark:text-gray-400 hover:border-primary/50'}`}
                     >
-                       <span className="material-symbols-outlined text-[18px]">{cat.icon}</span>
-                       <span className="font-bold text-sm whitespace-nowrap">{cat.label}</span>
+                       <span className="material-symbols-outlined text-[16px] md:text-[18px]">{cat.icon}</span>
+                       <span className="font-bold text-xs md:text-sm whitespace-nowrap">{cat.label}</span>
                     </button>
 
-                    <div className={`h-12 w-0.5 transition-all duration-300 ${isActive ? 'bg-primary h-12' : 'bg-transparent h-0'}`}></div>
+                    {/* Active Stem Down */}
+                    <div className={`w-0.5 transition-all duration-300 hidden md:block ${isActive ? 'bg-primary h-12' : 'bg-transparent h-0'}`}></div>
                  </div>
                );
              })}
           </div>
 
           {/* LEVEL 3: LEAVES - RECTANGULAR CONTAINER */}
-          <div className="w-full bg-gray-50/50 dark:bg-white/5 rounded-lg border border-gray-200 dark:border-white/10 p-8 md:p-12 mt-4 min-h-[400px] transition-all relative">
-             <div className="absolute top-0 left-1/2 -translate-x-1/2 -mt-2 w-4 h-2 bg-primary rounded-b-full"></div>
+          <div className="w-full bg-gray-50/50 dark:bg-white/5 rounded-lg border border-gray-200 dark:border-white/10 p-4 md:p-12 mt-4 min-h-[300px] md:min-h-[400px] transition-all relative">
+             {/* Decorator Triangle (Desktop Only) */}
+             <div className="hidden md:block absolute top-0 left-1/2 -translate-x-1/2 -mt-2 w-4 h-2 bg-primary rounded-b-full"></div>
 
-             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+             {/* Grid: 1 col mobile, 2 cols tablet, 3 cols desktop */}
+             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-8">
                {team.filter(m => m.category === activeCategory).map((m, idx) => renderMemberCard(m, idx))}
                {team.filter(m => m.category === activeCategory).length === 0 && (
                  <div className="col-span-full text-center py-20 text-muted dark:text-gray-500">
@@ -322,11 +344,6 @@ const Team = () => {
                )}
              </div>
           </div>
-        </div>
-        
-        {/* Mobile Swipe Hint */}
-        <div className="md:hidden text-center text-xs text-muted dark:text-gray-500 mt-4 animate-pulse">
-           ← Swipe to explore structure →
         </div>
       </section>
 
