@@ -154,8 +154,8 @@ const Team = () => {
     },
     {
       name: 'Peter Kersi',
-      role: 'Technical Product Associate',
-      description: 'Bridges the gap between product vision and technical execution. Translates ideas into actionable tasks and supports implementation planning.',
+      role: 'Technical Product & UI Design',
+      description: 'Bridges the gap between product vision and technical execution. Translates ideas into actionable tasks, contributes to Figma designs, and supports implementation.',
       category: 'product',
       linkedin: 'https://www.linkedin.com/in/peter-kersi-9826372b7/',
       github: 'https://github.com/jpkersi'
