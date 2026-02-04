@@ -39,7 +39,7 @@ const Team = () => {
       github: 'https://github.com/AlynTetteh'
     },
     {
-      name: 'Nana Yaw',
+      name: 'Nana Yaw Akuffo-Parry',
       role: 'Frontend Developer',
       description: 'Building beautiful, responsive user interfaces and ensuring a seamless experience for our customers.',
       category: 'frontend',
@@ -69,7 +69,7 @@ const Team = () => {
     },
     // --- DESIGN TEAM ---
     {
-      name: 'Damilola',
+      name: 'Damilola Tomisin Ayodeji ',
       role: 'UI/UX Designer',
       description: 'Designs intuitive user flows and validates product experience through research.',
       category: 'design',
