@@ -1,32 +1,49 @@
 import React, { useState, useEffect, useRef } from 'react';
 
-// --- COMPONENT: THE GROWTH CYCLE ANIMATION (INDIVIDUAL SPROUTING) ---
+// --- COMPONENT: THE GROWTH CYCLE ANIMATION (STOPS AT END) ---
 const GrowthAnimation = ({ team }) => {
   const [isPaused, setIsPaused] = useState(false);
   const [progress, setProgress] = useState(0); // 0 to 100
+  const [isFinished, setIsFinished] = useState(false);
   const requestRef = useRef();
 
-  // Animation Speed Configuration
-  const SPEED = 0.2; 
+  // Animation Speed
+  const SPEED = 0.25; 
 
   const animate = () => {
-    if (!isPaused) {
+    if (!isPaused && !isFinished) {
       setProgress(prev => {
-        if (prev >= 100) return 0; // Auto-loop
-        return prev + SPEED;
+        const next = prev + SPEED;
+        if (next >= 100) {
+           setIsFinished(true);
+           setIsPaused(true); // Stop the loop
+           return 100;
+        }
+        return next;
       });
+      requestRef.current = requestAnimationFrame(animate);
     }
-    requestRef.current = requestAnimationFrame(animate);
   };
 
   useEffect(() => {
-    requestRef.current = requestAnimationFrame(animate);
+    if (!isFinished && !isPaused) {
+       requestRef.current = requestAnimationFrame(animate);
+    }
     return () => cancelAnimationFrame(requestRef.current);
-  }, [isPaused]);
+  }, [isPaused, isFinished]);
 
   const handleRestart = () => {
+    setIsFinished(false);
     setProgress(0);
     setIsPaused(false);
+  };
+
+  const handlePlayPause = () => {
+    if (isFinished) {
+       handleRestart();
+    } else {
+       setIsPaused(!isPaused);
+    }
   };
 
   // Fixed positions on the tree (X, Y percentages)
@@ -44,17 +61,13 @@ const GrowthAnimation = ({ team }) => {
       {/* --- CONTROLS --- */}
       <div className="absolute top-6 left-6 z-50 flex gap-2">
         <button 
-          onClick={() => setIsPaused(!isPaused)}
+          onClick={handlePlayPause}
           className="bg-white/80 dark:bg-black/50 backdrop-blur-md px-4 py-2 rounded-md shadow-lg border border-gray-200 dark:border-white/10 text-dark dark:text-white font-bold text-xs uppercase tracking-widest hover:scale-105 transition-transform flex items-center gap-2"
         >
-          <span className="material-symbols-outlined text-sm">{isPaused ? 'play_arrow' : 'pause'}</span>
-          {isPaused ? 'Resume' : 'Pause'}
-        </button>
-        <button 
-          onClick={handleRestart}
-          className="bg-white/80 dark:bg-black/50 backdrop-blur-md p-2 rounded-md shadow-lg border border-gray-200 dark:border-white/10 text-dark dark:text-white hover:rotate-180 transition-transform"
-        >
-          <span className="material-symbols-outlined text-sm">refresh</span>
+          <span className="material-symbols-outlined text-sm">
+             {isFinished ? 'replay' : isPaused ? 'play_arrow' : 'pause'}
+          </span>
+          {isFinished ? 'Replay' : isPaused ? 'Resume' : 'Pause'}
         </button>
       </div>
 
@@ -102,58 +115,43 @@ const GrowthAnimation = ({ team }) => {
          {team.map((member, idx) => {
             const treePos = treePositions[idx % treePositions.length];
             
-            // --- TIMING LOGIC ---
-            // We stagger the "Start Drop" time for each person
-            // Global 'progress' goes 0 -> 100
-            
-            // When does THIS person appear on the tree? (25% + slight random offset)
+            // TIMING LOGIC
             const appearTime = 25 + (idx * 2);
-            
-            // When does THIS person start falling? (45% + heavy stagger)
-            // We spread the drop times out significantly so they don't fall in a clump
             const dropStartTime = 45 + (idx * 3.5); 
-            
-            // Fall duration (how long it takes to hit ground)
             const dropDuration = 5; 
-            
-            // When does the sprout start? (Immediately after landing)
             const landTime = dropStartTime + dropDuration;
 
-            // --- CALCULATE STATE ---
-            let state = 'hidden'; // hidden, tree, falling, grounded
-            let localProgress = 0; // 0-1 for current phase
+            // CALCULATE STATE
+            let state = 'hidden'; 
+            let localProgress = 0; 
 
             if (progress < appearTime) {
                state = 'hidden';
             } else if (progress < dropStartTime) {
                state = 'tree';
-               localProgress = Math.min(1, (progress - appearTime) / 10); // Grow scale on tree
+               localProgress = Math.min(1, (progress - appearTime) / 10);
             } else if (progress < landTime) {
                state = 'falling';
-               localProgress = (progress - dropStartTime) / dropDuration; // 0 (top) to 1 (ground)
+               localProgress = (progress - dropStartTime) / dropDuration; 
             } else {
                state = 'grounded';
-               localProgress = Math.min(1, (progress - landTime) / 10); // Bloom progress
+               localProgress = Math.min(1, (progress - landTime) / 10); 
             }
 
-            // --- POSITION LOGIC ---
-            const groundX = 8 + (idx * (84 / (team.length - 1))); // Spread 8% to 92%
-            const treeLeftAbsolute = 50 + ((treePos.x - 50) * 0.4); // Centered tree coordinates
+            // POSITION LOGIC
+            const groundX = 8 + (idx * (84 / (team.length - 1))); 
+            const treeLeftAbsolute = 50 + ((treePos.x - 50) * 0.4); 
 
             let top = `${treePos.y}%`;
             let left = `${treeLeftAbsolute}%`;
             let scale = state === 'tree' ? localProgress : 1;
             let opacity = state === 'hidden' ? 0 : 1;
             
-            // Stem Height Calculation (Grows from 0px to 40px)
             const stemHeight = state === 'grounded' ? localProgress * 40 : 0;
 
             if (state === 'falling') {
-               // Lerp Y: Tree Y -> 85% (Ground)
                const currentY = treePos.y + (localProgress * (85 - treePos.y));
                top = `${currentY}%`;
-               
-               // Lerp X: Tree X -> Ground X
                const currentX = treeLeftAbsolute + (localProgress * (groundX - treeLeftAbsolute));
                left = `${currentX}%`;
             } else if (state === 'grounded') {
@@ -173,7 +171,7 @@ const GrowthAnimation = ({ team }) => {
                     zIndex: state === 'grounded' ? 20 + idx : 10
                  }}
                >
-                  {/* VISUAL: THE FRUIT (Hidden once sprouted) */}
+                  {/* FRUIT */}
                   {state !== 'grounded' && (
                      <div className="w-10 h-10 rounded-full bg-white dark:bg-white/10 shadow-lg border-2 border-primary flex items-center justify-center relative animate-pulse">
                         <span className="text-xs font-black text-primary">
@@ -182,11 +180,9 @@ const GrowthAnimation = ({ team }) => {
                      </div>
                   )}
 
-                  {/* VISUAL: THE SPROUTING FLOWER (Only when grounded) */}
+                  {/* FLOWER/CARD */}
                   {state === 'grounded' && (
                      <div className="flex flex-col items-center justify-end relative -top-8">
-                        
-                        {/* The Card (Blooms Scale 0 -> 1) */}
                         <div 
                            className="bg-white dark:bg-[#232323] p-2 rounded-md shadow-xl border-b-4 border-primary w-24 hover:scale-125 hover:z-50 transition-transform cursor-pointer origin-bottom"
                            style={{ 
@@ -206,12 +202,7 @@ const GrowthAnimation = ({ team }) => {
                            <p className="text-[9px] font-black text-dark dark:text-white text-center leading-tight truncate">{member.name}</p>
                            <p className="text-[7px] font-bold text-primary text-center uppercase tracking-wider truncate mt-1">{member.role}</p>
                         </div>
-
-                        {/* The Stem (Grows Height) */}
-                        <div 
-                           className="w-1 bg-green-600 rounded-full"
-                           style={{ height: `${stemHeight}px` }}
-                        ></div>
+                        <div className="w-1 bg-green-600 rounded-full" style={{ height: `${stemHeight}px` }}></div>
                      </div>
                   )}
                </div>
@@ -365,33 +356,24 @@ const Team = () => {
 
   return (
     <div className="flex flex-col w-full bg-bg-light dark:bg-dark min-h-screen transition-colors duration-300">
-      
-      {/* Header */}
       <section className="pt-24 pb-10 px-4 text-center">
         <span className="text-primary font-bold text-xs uppercase tracking-widest block mb-4">The Structure</span>
         <h1 className="text-4xl md:text-6xl font-black text-dark dark:text-white tracking-tighter">The myKart Team</h1>
       </section>
 
-      {/* TREE DIAGRAM SECTION */}
       <section className="px-4 overflow-x-auto relative z-10">
         <div className="min-w-[800px] max-w-6xl mx-auto flex flex-col items-center">
-          
-          {/* LEVEL 1: FOUNDER (ROOT) */}
           <div className="relative mb-12">
              {leadMember && renderMemberCard(leadMember, 0, true)}
              <div className="absolute left-1/2 -translate-x-1/2 top-full h-12 w-0.5 bg-gray-300 dark:bg-gray-700"></div>
           </div>
-
-          {/* LEVEL 2: BRANCHES */}
           <div className="w-full flex justify-center items-start gap-4 relative">
              <div className="absolute top-0 left-[10%] right-[10%] h-0.5 bg-gray-300 dark:bg-gray-700"></div>
-
              {categories.map((cat, idx) => {
                const isActive = activeCategory === cat.id;
                return (
                  <div key={cat.id} className="flex flex-col items-center flex-1 relative">
                     <div className="h-8 w-0.5 bg-gray-300 dark:bg-gray-700"></div>
-                    
                     <button 
                       onClick={() => setActiveCategory(cat.id)}
                       className={`relative z-10 px-6 py-3 rounded-md border-2 transition-all duration-300 flex items-center gap-2 shadow-lg hover:scale-105 active:scale-95 ${isActive ? 'bg-primary border-primary text-white scale-110 shadow-primary/30' : 'bg-white dark:bg-[#1e1e1e] border-gray-200 dark:border-white/10 text-muted dark:text-gray-400 hover:border-primary/50'}`}
@@ -399,17 +381,13 @@ const Team = () => {
                        <span className="material-symbols-outlined text-[18px]">{cat.icon}</span>
                        <span className="font-bold text-sm whitespace-nowrap">{cat.label}</span>
                     </button>
-
                     <div className={`h-12 w-0.5 transition-all duration-300 ${isActive ? 'bg-primary h-12' : 'bg-transparent h-0'}`}></div>
                  </div>
                );
              })}
           </div>
-
-          {/* LEVEL 3: LEAVES */}
           <div className="w-full bg-gray-50/50 dark:bg-white/5 rounded-lg border border-gray-200 dark:border-white/10 p-8 md:p-12 mt-4 min-h-[400px] transition-all relative">
              <div className="absolute top-0 left-1/2 -translate-x-1/2 -mt-2 w-4 h-2 bg-primary rounded-b-full"></div>
-
              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
                {team.filter(m => m.category === activeCategory).map((m, idx) => renderMemberCard(m, idx))}
                {team.filter(m => m.category === activeCategory).length === 0 && (
@@ -422,12 +400,10 @@ const Team = () => {
         </div>
       </section>
 
-      {/* --- UNITY ANIMATION (No Gap Above) --- */}
       <section className="w-full mt-0">
          <GrowthAnimation team={team} />
       </section>
 
-      {/* Bio Modal */}
       {selectedMember && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-dark/80 backdrop-blur-md animate-in fade-in duration-300" onClick={() => setSelectedMember(null)}>
           <div className="bg-white dark:bg-gray-900 rounded-lg w-full max-w-lg shadow-2xl animate-in zoom-in-95 duration-200 p-8 md:p-12 text-center relative overflow-hidden border border-gray-100 dark:border-white/10" onClick={(e) => e.stopPropagation()}>
@@ -451,7 +427,6 @@ const Team = () => {
         </div>
       )}
 
-      {/* Join CTA */}
       <section className="py-32 px-4 bg-white dark:bg-white/5 border-t border-gray-100 dark:border-white/10 relative overflow-hidden text-center">
          <div className="max-w-4xl mx-auto relative z-10">
             <h2 className="text-4xl md:text-7xl font-black text-dark dark:text-white tracking-tighter mb-8">Grow with us.</h2>
