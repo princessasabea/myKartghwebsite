@@ -535,7 +535,7 @@ const Wireframes: React.FC = () => {
     { title: "Become a Partner", description: "Vendor onboarding for market mamas and chefs.", img: "https://raw.githubusercontent.com/princessasabea/myKartghwebsite/main/public/vendordashboard.png" },
     { title: "Order History", description: "Transparent log of all past and current orders.", img: "https://raw.githubusercontent.com/princessasabea/myKartghwebsite/main/public/order%20history%20screen.png" },
     { title: "Roommate Run", description: "Shared group carts for kommunity purchasing.", img: "https://raw.githubusercontent.com/princessasabea/myKartghwebsite/main/public/group-order-screen.png" },
-    { title: "University Roommates", description: "Shared group carts for Kommunity purchasing.", img: "https://raw.githubusercontent.com/princessasabea/myKartghwebsite/main/public/uniroommates.png" },
+    { title: "University Roommates", description: "Shared group carts for University students.", img: "https://raw.githubusercontent.com/princessasabea/myKartghwebsite/main/public/uniroommates.png" },
     { title: "Active Tracking", description: "Live GPS updates for direct and truck deliveries.", img: "https://raw.githubusercontent.com/princessasabea/myKartghwebsite/main/public/truck-tracking.png" }
   ];
 
