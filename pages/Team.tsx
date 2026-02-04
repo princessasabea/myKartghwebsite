@@ -9,7 +9,7 @@ const UnityOrbitAnimation = ({ team }) => {
   const CENTER = 250; // Center of the 500x500 SVG
 
   return (
-    <div className="w-full h-[400px] md:h-[600px] relative overflow-hidden bg-gradient-to-b from-sky-50 to-white dark:from-[#0f172a] dark:to-[#121212] border-t border-gray-200 dark:border-white/5 font-sans group select-none flex flex-col items-center justify-center">
+    <div className="w-full h-[380px] md:h-[600px] relative overflow-hidden bg-gradient-to-b from-sky-50 to-white dark:from-[#0f172a] dark:to-[#121212] border-t border-gray-200 dark:border-white/5 font-sans group select-none flex flex-col items-center justify-center transition-colors duration-300">
       
       {/* --- CONTROLS --- */}
       <div className="absolute top-4 left-4 z-50">
@@ -29,7 +29,8 @@ const UnityOrbitAnimation = ({ team }) => {
       </div>
 
       {/* --- THE ANIMATION CONTAINER (SCALED FOR MOBILE) --- */}
-      <div className="relative w-[500px] h-[500px] max-w-full transform scale-[0.65] sm:scale-[0.8] md:scale-100 transition-transform origin-center">
+      {/* scale-[0.55] forces the 500px container to fit on 320px screens */}
+      <div className="relative w-[500px] h-[500px] max-w-full transform scale-[0.55] sm:scale-[0.7] md:scale-100 transition-transform origin-center">
         
         {/* CSS for Rotation */}
         <style>{`
@@ -84,31 +85,20 @@ const UnityOrbitAnimation = ({ team }) => {
               const angle = (idx / total) * 360; 
               const radian = (angle * Math.PI) / 180;
               
-              // Calculate Position on Circle
               const x = CENTER + RADIUS * Math.cos(radian);
               const y = CENTER + RADIUS * Math.sin(radian);
-
-              // Stagger floating animation
               const delay = idx * 0.2;
 
               return (
                 <div
                   key={idx}
                   className="absolute w-12 h-12 -ml-6 -mt-6 z-30"
-                  style={{
-                    left: `${x}px`,
-                    top: `${y}px`,
-                  }}
+                  style={{ left: `${x}px`, top: `${y}px` }}
                 >
                    {/* Counter-Rotate Container */}
-                   <div 
-                     className={`w-full h-full flex flex-col items-center justify-center ${isPaused ? 'paused' : 'animate-counter-rotate'}`}
-                   >
+                   <div className={`w-full h-full flex flex-col items-center justify-center ${isPaused ? 'paused' : 'animate-counter-rotate'}`}>
                       {/* Floating Wrapper */}
-                      <div 
-                        className={`relative group cursor-pointer ${isPaused ? 'paused' : 'animate-float'}`}
-                        style={{ animationDelay: `${delay}s` }}
-                      >
+                      <div className={`relative group cursor-pointer ${isPaused ? 'paused' : 'animate-float'}`} style={{ animationDelay: `${delay}s` }}>
                          {/* Avatar Circle */}
                          <div className="w-12 h-12 rounded-full bg-white dark:bg-[#232323] border-2 border-primary shadow-lg flex items-center justify-center overflow-hidden hover:scale-125 transition-transform duration-300">
                             {member.image ? (
@@ -119,8 +109,7 @@ const UnityOrbitAnimation = ({ team }) => {
                                </span>
                             )}
                          </div>
-                         
-                         {/* Name Tooltip (Visible on Hover) */}
+                         {/* Name Tooltip */}
                          <div className="absolute -bottom-8 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity bg-dark dark:bg-white text-white dark:text-dark text-[8px] font-bold px-2 py-1 rounded whitespace-nowrap pointer-events-none shadow-xl">
                             {member.name}
                          </div>
@@ -130,13 +119,11 @@ const UnityOrbitAnimation = ({ team }) => {
               );
            })}
         </div>
-
       </div>
       
-      <div className="absolute bottom-6 md:bottom-10 text-center opacity-60">
+      <div className="absolute bottom-4 md:bottom-10 text-center opacity-60">
          <p className="text-[8px] md:text-[10px] font-bold uppercase tracking-[0.3em] text-muted dark:text-gray-400">United around the Mission</p>
       </div>
-
     </div>
   );
 };
@@ -351,18 +338,18 @@ const Team = () => {
       {/* Bio Modal */}
       {selectedMember && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-dark/80 backdrop-blur-md animate-in fade-in duration-300" onClick={() => setSelectedMember(null)}>
-          <div className="bg-white dark:bg-gray-900 rounded-lg w-full max-w-lg shadow-2xl animate-in zoom-in-95 duration-200 p-8 md:p-12 text-center relative overflow-hidden border border-gray-100 dark:border-white/10" onClick={(e) => e.stopPropagation()}>
-            <div className="absolute top-0 right-0 p-6">
+          <div className="bg-white dark:bg-gray-900 rounded-lg w-full max-w-lg shadow-2xl animate-in zoom-in-95 duration-200 p-6 md:p-12 text-center relative overflow-hidden border border-gray-100 dark:border-white/10 overflow-y-auto max-h-[90vh]" onClick={(e) => e.stopPropagation()}>
+            <div className="absolute top-0 right-0 p-4 md:p-6">
                <button onClick={() => setSelectedMember(null)} className="w-10 h-10 rounded-md bg-gray-50 dark:bg-white/10 flex items-center justify-center text-muted dark:text-white hover:bg-gray-100 transition-colors">
                  <span className="material-symbols-outlined">close</span>
                </button>
             </div>
-            <div className="w-24 h-24 bg-bg-light dark:bg-white/5 rounded-md flex items-center justify-center font-black text-primary overflow-hidden border border-gray-50 dark:border-white/5 shadow-inner mx-auto mb-6">
+            <div className="w-20 h-20 md:w-24 md:h-24 bg-bg-light dark:bg-white/5 rounded-md flex items-center justify-center font-black text-primary overflow-hidden border border-gray-50 dark:border-white/5 shadow-inner mx-auto mb-6 mt-4">
               {selectedMember.image ? <img src={selectedMember.image} className="w-full h-full object-cover" alt={selectedMember.name} /> : <span className="text-3xl">{selectedMember.name.split(' ').map(n => n[0]).join('')}</span>}
             </div>
-            <h3 className="text-3xl font-black text-dark dark:text-white mb-1">{selectedMember.name}</h3>
+            <h3 className="text-2xl md:text-3xl font-black text-dark dark:text-white mb-1">{selectedMember.name}</h3>
             <p className="text-primary font-extrabold uppercase tracking-widest text-xs mb-6">{selectedMember.role}</p>
-            <p className="text-muted dark:text-gray-300 text-lg leading-relaxed mb-8">{selectedMember.description}</p>
+            <p className="text-muted dark:text-gray-300 text-sm md:text-lg leading-relaxed mb-8">{selectedMember.description}</p>
             <div className="flex justify-center gap-4 mb-8">
               {selectedMember.linkedin && <a href={selectedMember.linkedin} target="_blank" rel="noopener noreferrer" className="w-12 h-12 rounded-md bg-gray-50 dark:bg-white/10 flex items-center justify-center text-muted dark:text-white hover:bg-primary hover:text-white transition-all"><span className="material-symbols-outlined">link</span></a>}
               {selectedMember.github && <a href={selectedMember.github} target="_blank" rel="noopener noreferrer" className="w-12 h-12 rounded-md bg-gray-50 dark:bg-white/10 flex items-center justify-center text-muted dark:text-white hover:bg-primary hover:text-white transition-all"><span className="material-symbols-outlined text-[20px]">code</span></a>}
@@ -373,7 +360,7 @@ const Team = () => {
       )}
 
       {/* Join CTA */}
-      <section className="py-32 px-4 bg-white dark:bg-white/5 border-t border-gray-100 dark:border-white/10 relative overflow-hidden text-center">
+      <section className="py-20 md:py-32 px-4 bg-white dark:bg-white/5 border-t border-gray-100 dark:border-white/10 relative overflow-hidden text-center">
          <div className="max-w-4xl mx-auto relative z-10">
             <h2 className="text-4xl md:text-7xl font-black text-dark dark:text-white tracking-tighter mb-8">Grow with us.</h2>
             <a href="https://tally.so/r/WO2v4v" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-3 px-10 py-5 bg-primary text-white font-black text-lg rounded-md shadow-2xl hover:scale-105 transition-all">
