@@ -74,10 +74,12 @@ const Navbar: React.FC<{ onToggle: (open: boolean) => void }> = ({ onToggle }) =
     <nav className="sticky top-0 z-[100] w-full bg-bg-light dark:bg-dark border-b border-gray-100 dark:border-white/10 shadow-sm transition-colors duration-300">
       <div className="max-w-6xl mx-auto px-4 py-3 flex justify-between items-center relative z-[110]">
         <Link to="/" className="flex items-center gap-2 group">
-          <img src="/logo2.jpeg" alt="MyKart Logo" className="h-10 w-auto object-contain" />
-          {/* ADDED: dark:text-white */}
-          <span className="text-xl font-extrabold tracking-tight text-dark dark:text-white dark:text-white transition-colors">MyKart</span>
+          <img 
+            src="/logo2.jpeg" 
+            alt="MyKart Logo" 
+            className="h-12 w-auto object-contain"
         </Link>
+        
 
         {/* Desktop Menu - ADDED: dark:text-white dark:hover:text-primary */}
         <div className="hidden md:flex items-center gap-8">
