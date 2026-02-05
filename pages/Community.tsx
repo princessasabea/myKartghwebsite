@@ -101,10 +101,10 @@ const Community: React.FC = () => {
   const uniStory = [
     { title: "Start the Session", desc: "One roommate selects Shoprite and chooses 'Roommate Order'. They set the hostel/apartment address and a delivery window.", icon: "school", image: "https://raw.githubusercontent.com/princessasabea/myKartghwebsite/main/public/uniroommates.png" },
     { title: "Roomies Join In", desc: "Share the link or scan the QR. Each roommate joins the session and gets their own private cart within the same store run.", icon: "group_add", image: "https://raw.githubusercontent.com/princessasabea/myKartghwebsite/main/public/group-order-screen.png" },
-    { title: "Shop individually", desc: "Everyone adds their specific items from the Shoprite catalog. Carts remain private—no one knows you're buying extra indomie!", icon: "shopping_cart", image: "https://raw.githubusercontent.com/princessasabea/myKartghwebsite/main/public/group-order-screen.png" },
+    { title: "Shop individually", desc: "Everyone adds their specific items from the Shoprite catalog. One person orders for all(but everyone has to approve the order)", icon: "shopping_cart", image: "https://raw.githubusercontent.com/princessasabea/myKartghwebsite/main/public/group-order-screen.png" },
     { title: "Separate Payments", desc: "Each roommate pays for their own items. No one has to 'owe' anyone money. MyKart merges it into one delivery task automatically.", icon: "account_balance_wallet", image: "https://raw.githubusercontent.com/princessasabea/myKartghwebsite/main/public/signin.png" },
-    { title: "The Single Run", desc: "A personal shopper picks all items in one efficient run, packing them into separate bags for each roommate. One rider brings it all.", icon: "delivery_dining", image: "https://lh3.googleusercontent.com/aida-public/AB6AXuBX6IdYG5gZ1ig2wwDuzW1Mh_wiMfLWi3jezSpif86v-fv38DOYqc-IMn5DTyCLwoTLqUpmwGkr5iajlR7uKDM8nRzPpNxbImA7-jPCuKEsRQGn5eTDAIuF9aIK4SY40Bpbixu9vFzfie63ZW8OZlVVkM3ehDr7FSu1jqP9YKhR7m7_YzYucKJpH89wwG6y7Lr3vq41_UsiUvie35X1cEvEviNRrxn4DodCc7Z-wEGszVFnaWKNa2ybjzqq1wMt3JeqShj_VVYZb7k" },
-    { title: "Drop-off", desc: "Bags are labeled by name/room number. Cheap delivery, no payment stress, and bulk efficiency for the whole apartment.", icon: "check_circle", image: "https://lh3.googleusercontent.com/aida-public/AB6AXuDm9yQivXoP34fFXrvm3b9NKeSaOm5r5eHRJvlerRUuqNPSU_HiOxwYjTMo0jSnS_TWMKLj8Mn3HSKMpTzQJFb4YLdyAxhdyMuWVO9NoSNhhsiPTxbiqXyXQjIgVbwhDOQkz8Y84H9MuDKcxa_pJg1uu1TKknsamvOxkmv9srQc-Dl2uDxdVEvGA4vEpItcZTY8hpbQQdt9HsBCGdzX-7ze_XqrfFGDaA0ivmmYCD8eVRX4BSz-ukLXnhyCN3NVZKaUaBXSvotfkMA" }
+    { title: "The Single Run", desc: "A personal shopper picks all items in one efficient run. One rider brings it all.", icon: "delivery_dining", image: "https://lh3.googleusercontent.com/aida-public/AB6AXuBX6IdYG5gZ1ig2wwDuzW1Mh_wiMfLWi3jezSpif86v-fv38DOYqc-IMn5DTyCLwoTLqUpmwGkr5iajlR7uKDM8nRzPpNxbImA7-jPCuKEsRQGn5eTDAIuF9aIK4SY40Bpbixu9vFzfie63ZW8OZlVVkM3ehDr7FSu1jqP9YKhR7m7_YzYucKJpH89wwG6y7Lr3vq41_UsiUvie35X1cEvEviNRrxn4DodCc7Z-wEGszVFnaWKNa2ybjzqq1wMt3JeqShj_VVYZb7k" },
+    { title: "Drop-off", desc: "Bags are labeled by name/room number. Cheap delivery, no payment stress, and bulk efficiency for the whole hostels/apartment.", icon: "check_circle", image: "https://lh3.googleusercontent.com/aida-public/AB6AXuDm9yQivXoP34fFXrvm3b9NKeSaOm5r5eHRJvlerRUuqNPSU_HiOxwYjTMo0jSnS_TWMKLj8Mn3HSKMpTzQJFb4YLdyAxhdyMuWVO9NoSNhhsiPTxbiqXyXQjIgVbwhDOQkz8Y84H9MuDKcxa_pJg1uu1TKknsamvOxkmv9srQc-Dl2uDxdVEvGA4vEpItcZTY8hpbQQdt9HsBCGdzX-7ze_XqrfFGDaA0ivmmYCD8eVRX4BSz-ukLXnhyCN3NVZKaUaBXSvotfkMA" }
   ];
 
   return (
@@ -131,7 +131,7 @@ const Community: React.FC = () => {
         <div className="max-w-4xl mx-auto text-center">
            <h2 className="text-xl md:text-5xl font-black mb-4 md:mb-8 tracking-tighter text-dark dark:text-white">More Than Just Groceries.</h2>
            <p className="text-sm md:text-xl text-muted dark:text-gray-300 leading-relaxed font-medium mb-6 md:mb-12">
-             We believe every meal has a story. From the "Market Mama" who selects the perfect yams to the "K-Truck" driver who brings the savings to your doorstep. We are building a space where technology honors tradition.
+             We believe every meal has a story. From the "Market Mama" who selects the perfect yams to the "K Truck" driver who brings the savings to your doorstep. We are building a space where technology honors tradition.
            </p>
            <div className="w-12 md:w-24 h-1 bg-primary/20 mx-auto rounded-full"></div>
         </div>
@@ -157,7 +157,7 @@ const Community: React.FC = () => {
         <div className="max-w-6xl mx-auto">
           <div className="mb-6 md:mb-16">
             <span className="text-primary font-bold text-[10px] md:text-xs uppercase tracking-widest block mb-2 md:mb-4">COMMUNITY FEED</span>
-            <h2 className="text-2xl md:text-6xl font-black text-dark dark:text-white tracking-tighter mb-2 md:mb-4">Kommunity Hub <span className="text-[10px] md:text-sm font-bold bg-dark text-white px-2 md:px-3 py-1 rounded-full align-middle ml-1 md:ml-2 uppercase tracking-widest">MVP</span></h2>
+            <h2 className="text-2xl md:text-6xl font-black text-dark dark:text-white tracking-tighter mb-2 md:mb-4">Kommunity Hub <span className="text-[10px] md:text-sm font-bold bg-dark text-white px-2 md:px-3 py-1 rounded-full align-middle ml-1 md:ml-2 uppercase tracking-widest">Future Scope</span></h2>
             <p className="text-sm md:text-xl text-muted dark:text-gray-300 font-medium max-w-2xl">
               Stay connected with local vendors, discover new recipes from local chefs, and keep up with neighborhood events.
             </p>
