@@ -35,7 +35,7 @@ const Vision: React.FC = () => {
                </p>
                <p>
                  <strong className="text-dark dark:text-white">You Order, We Handle the Rest.</strong><br/>
-                 We connect you to the stores you already trust <span className="text-primary">basically most of the retail stores & marts you know</span>. A dedicated shopper picks your items with care and delivers them straight to your doorstep.
+                 We connect you to the stores you already trust; <span className="text-primary">basically most of the retail stores & marts you know</span>. A dedicated shopper picks your items with care and delivers them straight to your doorstep.
                </p>
              </div>
           </div>
