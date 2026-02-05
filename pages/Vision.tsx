@@ -35,7 +35,7 @@ const Vision: React.FC = () => {
                </p>
                <p>
                  <strong className="text-dark dark:text-white">You Order, We Handle the Rest.</strong><br/>
-                 We connect you to the stores you already trust—like <span className="text-primary">MaxMart, Melcom, and Shoprite</span>. A dedicated shopper picks your items with care and delivers them straight to your doorstep.
+                 We connect you to the stores you already trust—like <span className="text-primary">Most of the retail stores & marts you know</span>. A dedicated shopper picks your items with care and delivers them straight to your doorstep.
                </p>
              </div>
           </div>
@@ -79,7 +79,7 @@ const Vision: React.FC = () => {
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
              {[
-               { title: 'Farm to Neighborhood', desc: 'We bring bulk fresh produce directly from the market to your community, cutting out the middleman costs.', icon: 'agriculture' },
+               { title: 'Market to Neighborhood', desc: 'We bring bulk fresh produce directly from the market to your community, cutting out the middleman costs.', icon: 'agriculture' },
                { title: 'Wider Reach', desc: 'Serving extended zones (like Madina & Dzorwulu) with scheduled stops, bringing convenience closer to home.', icon: 'map' },
                { title: 'Flexible Pickup', desc: 'Missed home delivery? Use a secure code to pick up your package from our truck at hubs like Accra Mall.', icon: 'qr_code_scanner' }
              ].map((item, i) => (
