@@ -8,13 +8,13 @@ const Vision: React.FC = () => {
       {/* --- HERO: THE ORIGIN --- */}
       <section className="py-24 px-4 bg-white dark:bg-white/5 border-b border-gray-100 dark:border-white/10 relative overflow-hidden">
         <div className="max-w-6xl mx-auto relative z-10">
-          <span className="text-primary font-black text-xs uppercase tracking-[0.3em] block mb-4">THE MISSION</span>
+          <span className="text-primary font-black text-xs uppercase tracking-[0.3em] block mb-4">THE VISION</span>
           <h1 className="text-5xl md:text-7xl font-black mb-8 text-dark dark:text-white tracking-tighter leading-[0.95]">
             Making grocery shopping <br/>
             <span className="text-primary italic">easy for Ghana.</span>
           </h1>
           <p className="text-xl md:text-2xl text-muted dark:text-gray-300 max-w-3xl leading-relaxed font-medium">
-            Born from late-night calls across time zones and a refusal to accept the status quo. We are students building the infrastructure for a more convenient life.
+            Born from late night calls across time zones and a refusal to accept the status quo. We are students building the infrastructure for a more convenient life.
           </p>
         </div>
         <div className="absolute top-0 right-0 w-1/3 h-full bg-primary/5 -skew-x-12 transform origin-top-right"></div>
@@ -165,7 +165,7 @@ const Vision: React.FC = () => {
                   <span className="material-symbols-outlined text-3xl text-dark dark:text-white mb-4">location_on</span>
                   <h3 className="text-xl font-bold text-dark dark:text-white mb-2">Accurate Tracking</h3>
                   <p className="text-muted dark:text-gray-400 text-sm leading-relaxed">
-                     No more guessing games. We are committed to providing precise, real-time tracking for your deliveries so you are always in the loop.
+                     No more guessing games. We are committed to providing precise, real time tracking for your deliveries so you are always in the loop.
                   </p>
                </div>
             </div>
